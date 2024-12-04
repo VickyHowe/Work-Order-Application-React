@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const SkillSet = require('../models/SkillSet');
+const authMiddleware = require('../middleware/authMiddleware'); // Adjust the path as necessary
 
 /**
  * @swagger
@@ -40,7 +41,7 @@ const SkillSet = require('../models/SkillSet');
  *       400:
  *         description: Bad request
  */
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     try {
         const skillSet = new SkillSet(req.body);
         await skillSet.save();
@@ -68,7 +69,7 @@ router.post('/', async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     try {
         const skillSets = await SkillSet.find();
         res.json(skillSets);
@@ -115,7 +116,7 @@ router.get('/', async (req, res) => {
  *       400:
  *         description: Bad request
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     try {
         const skillSet = await SkillSet.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(skillSet);
@@ -143,11 +144,11 @@ router.put('/:id', async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         await SkillSet.findByIdAndDelete(req.params.id);
         res.status(204).send();
-    } catch (error) {
+    } catch ( error) {
         res.status(500).json({ message: error.message });
     }
 });

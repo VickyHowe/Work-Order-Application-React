@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Notifications = require('../models/Notifications');
+const authMiddleware = require('../middleware/authMiddleware');
 
 /**
  * @swagger
@@ -49,7 +50,7 @@ const Notifications = require('../models/Notifications');
  *       400:
  *         description: Bad request
  */
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     try {
         const notification = new Notifications(req.body);
         await notification.save();
@@ -77,7 +78,7 @@ router.post('/', async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     try {
         const notifications = await Notifications.find().populate('user');
         res.json(notifications);
@@ -127,13 +128,13 @@ router.get('/', async (req, res) => {
  *       200:
  *         description: Notification updated successfully
  *         content:
- *           application/json:
+ *           application /json:
  *             schema:
  *               $ref: '#/components/schemas/Notification'
  *       400:
  *         description: Bad request
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     try {
         const notification = await Notifications.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(notification);
@@ -161,7 +162,7 @@ router.put('/:id', async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         await Notifications.findByIdAndDelete(req.params.id);
         res.status(204).send();

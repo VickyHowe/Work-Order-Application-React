@@ -1,73 +1,78 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
+
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 const phoneNumberRegex = /^\d{10}$/; 
+const postalCodeRegex = /^[A-Za-z]\d[A-Za-z] ?\d[A-Za-z]\d$/; 
+const provinceRegex = /^[A-Za-z\s]+$/;
 
-const postalCodeRegex = /^\d{5}(-\d{4})?$/; 
-
-const provinceRegex = /^[A-Za-z\s]+$/; 
-
-const userProfileSchema = new mongoose.Schema({
-  firstName: { 
-    type: String,
-    required: true 
-  },
-  lastName: { 
-    type: String,
-    required: true 
-  },
-  email: { 
-    type: String,
-    required: true,
-    unique: true,
-    validate: {
-      validator: function(v) {
-        return emailRegex.test(v);
-      },
-      message: props => `${props.value} is not a valid email!`
-    }
-  },
-  role: { 
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Role" 
-  },
-  phoneNumber: { 
-    type: String,
-    required: true,
-    validate: {
-      validator: function(v) {
-        return phoneNumberRegex.test(v);
-      },
-      message: props => `${props.value} is not a valid phone number!`
-    }
-  },
-  address: { 
-    type: String 
-  },
-  city: { 
-    type: String 
-  },
-  province: {  
-    type: String,
-    validate: {
-      validator: function(v) {
-        return provinceRegex.test(v);
-      },
-      message: props => `${props.value} is not a valid province!`
-    }
-  },
-  postalCode: { 
-    type: String,
-    validate: {
-      validator: function(v) {
-        return postalCodeRegex.test(v);
-      },
-      message: props => `${props.value} is not a valid postal code!`
-    }
-  }
+const userSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        validate: {
+            validator: function(v) {
+                return emailRegex.test(v);
+            },
+            message: props => `${props.value} is not a valid email!`
+        }
+    },
+    firstName: {
+        type: String,
+        required: false,
+    },
+    lastName: {
+        type: String,
+        required: false,
+    },
+    phoneNumber: {
+        type: String,
+        required: false,
+        validate: {
+            validator: function(v) {
+                return phoneNumberRegex.test(v);
+            },
+            message: props => `${props.value} is not a valid phone number!`
+        }
+    },
+    address: {
+        type: String,
+        required: false,
+    },
+    city: {
+        type: String,
+        required: false,
+    },
+    province: {
+        type: String,
+        required: false,
+        validate: {
+            validator: function(v) {
+                return provinceRegex.test(v);
+            },
+            message: props => `${props.value} is not a valid province!`
+        }
+    },
+    postalCode: {
+        type: String,
+        required: false,
+        validate: {
+            validator: function(v) {
+                return postalCodeRegex.test(v);
+            },
+            message: props => `${props.value} is not a valid postal code!`
+        }
+    },
 });
 
-const UserProfile = mongoose.model("User Profile", userProfileSchema);
-
-module.exports = UserProfile; 
+module.exports = mongoose.model('User ', userSchema);

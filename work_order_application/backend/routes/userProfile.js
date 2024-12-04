@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const UserProfile = require('../models/UserProfile');
+const bcrypt = require('bcryptjs');
+const authMiddleware = require('../middleware/authMiddleware');
 
 /**
  * @swagger
@@ -14,7 +16,7 @@ const UserProfile = require('../models/UserProfile');
  * /api/userprofiles:
  *   post:
  *     summary: Create a new user profile
- *     tags: [UserProfiles]
+ *     tags: [User Profiles]
  *     requestBody:
  *       required: true
  *       content:
@@ -68,9 +70,13 @@ const UserProfile = require('../models/UserProfile');
  *       400:
  *         description: Bad request
  */
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     try {
-        const userProfile = new UserProfile(req.body);
+        const { password } = req.body;
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const userProfile = new UserProfile({ ...req.body, password: hashedPassword });
         await userProfile.save();
         res.status(201).json(userProfile);
     } catch (error) {
@@ -83,7 +89,7 @@ router.post('/', async (req, res) => {
  * /api/userprofiles:
  *   get:
  *     summary: Get all user profiles
- *     tags: [UserProfiles]
+ *     tags: [User Profiles]
  *     responses:
  *       200:
  *         description: A list of user profiles
@@ -96,7 +102,7 @@ router.post('/', async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     try {
         const userProfiles = await UserProfile.find().populate('role');
         res.json(userProfiles);
@@ -110,7 +116,7 @@ router.get('/', async (req, res) => {
  * /api/userprofiles/{id}:
  *   put:
  *     summary: Update a user profile
- *     tags: [UserProfiles]
+ *     tags: [User Profiles]
  *     parameters:
  *       - in: path
  *         name: id
@@ -171,7 +177,7 @@ router.get('/', async (req, res) => {
  *       400:
  *         description: Bad request
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     try {
         const userProfile = await UserProfile.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(userProfile);
@@ -185,7 +191,7 @@ router.put('/:id', async (req, res) => {
  * /api/userprofiles/{id}:
  *   delete:
  *     summary: Delete a user profile
- *     tags: [UserProfiles]
+ *     tags: [User  Profiles]
  *     parameters:
  *       - in: path
  *         name: id
@@ -199,7 +205,7 @@ router.put('/:id', async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         await UserProfile.findByIdAndDelete(req.params.id);
         res.status(204).send();

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const WorkOrderHistory = require('../models/WorkOrderHistory');
+const authMiddleware = require('../middleware/authMiddleware'); // Import the auth middleware
 
 /**
  * @swagger
@@ -49,7 +50,7 @@ const WorkOrderHistory = require('../models/WorkOrderHistory');
  *       400:
  *         description: Bad request
  */
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => { // Apply authMiddleware here
     try {
         const workOrderHistory = new WorkOrderHistory(req.body);
         await workOrderHistory.save();
@@ -77,7 +78,7 @@ router.post('/', async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => { // Apply authMiddleware here
     try {
         const workOrderHistories = await WorkOrderHistory.find().populate('user');
         res.json(workOrderHistories);
@@ -129,11 +130,11 @@ router.get('/', async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/WorkOrderHistory'
+ *               $ref: '#/components/schemas /WorkOrderHistory'
  *       400:
  *         description: Bad request
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => { // Apply authMiddleware here
     try {
         const workOrderHistory = await WorkOrderHistory.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(workOrderHistory);
@@ -161,7 +162,7 @@ router.put('/:id', async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => { // Apply authMiddleware here
     try {
         await WorkOrderHistory.findByIdAndDelete(req.params.id);
         res.status(204).send();

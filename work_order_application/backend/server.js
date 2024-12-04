@@ -12,6 +12,7 @@ const swaggerUi = require('swagger-ui-express');
 /**
  * Import Routes
  */
+const authRoutes = require('./routes/auth');
 const notificationsRoutes = require('./routes/notifications');
 const roleRoutes = require('./routes/role');
 const scheduleRoutes = require('./routes/schedule');
@@ -37,13 +38,21 @@ const swaggerOptions = {
       },
       servers: [
           {
-              url: `http://localhost:${process.env.PORT || 5000}`, // change for deployment
+              url: `http://localhost:${process.env.PORT || 5000}`,
           },
       ],
+      components: {
+          securitySchemes: {
+              bearerAuth: {
+                  type: 'http',
+                  scheme: 'bearer',
+                  bearerFormat: 'JWT',
+              },
+          },
+      },
   },
   apis: ['./routes/*.js'], 
 };
-
 
 
 /**
@@ -77,6 +86,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 /**
  * Routes
  */
+app.use('/api/auth', authRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/schedules', scheduleRoutes);

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Schedule = require('../models/Schedule');
+const authMiddleware = require('../middleware/authMiddleware'); // Adjust the path as necessary
 
 /**
  * @swagger
@@ -50,7 +51,7 @@ const Schedule = require('../models/Schedule');
  *       400:
  *         description: Bad request
  */
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     try {
         const schedule = new Schedule(req.body);
         await schedule.save();
@@ -78,7 +79,7 @@ router.post('/', async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     try {
         const schedules = await Schedule.find().populate('user');
         res.json(schedules);
@@ -135,7 +136,7 @@ router.get('/', async (req, res) => {
  *       400:
  *         description: Bad request
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     try {
         const schedule = await Schedule.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(schedule);
@@ -163,7 +164,7 @@ router.put('/:id', async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         await Schedule.findByIdAndDelete(req.params.id);
         res.status(204).send();
