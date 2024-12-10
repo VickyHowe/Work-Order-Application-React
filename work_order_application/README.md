@@ -83,8 +83,15 @@ npm install
 
     Fill in a Port for the project to run
 
+    Create a JWT_SECRET. This can be anything but for more secure otion, run in the termial and copy the string to `your_generated_secret_here`
+```
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-
+```
 MONGODB_URI = mongodb://localhost:27017/yourdatabasehere
 
 PORT= REPLACE THIS WITH A PORT
+
+JWT_SECRET=your_generated_secret_here
+```

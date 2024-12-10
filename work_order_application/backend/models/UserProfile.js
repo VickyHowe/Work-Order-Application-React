@@ -1,32 +1,11 @@
 const mongoose = require('mongoose');
 
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneNumberRegex = /^\d{10}$/; 
 const postalCodeRegex = /^[A-Za-z]\d[A-Za-z] ?\d[A-Za-z]\d$/; 
 const provinceRegex = /^[A-Za-z\s]+$/;
 
-const userSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        validate: {
-            validator: function(v) {
-                return emailRegex.test(v);
-            },
-            message: props => `${props.value} is not a valid email!`
-        }
-    },
+const userProfileSchema = new mongoose.Schema({
     firstName: {
         type: String,
         required: false,
@@ -75,4 +54,4 @@ const userSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model('User ', userSchema);
+module.exports = mongoose.model('UserProfile', userProfileSchema);
