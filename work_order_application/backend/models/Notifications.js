@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const notificationsSchema = new mongoose.Schema({
     user: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User Profile' 
+        ref: 'User', 
+        index: true
     },
     notificationDate: { 
         type: Date, 

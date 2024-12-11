@@ -53,7 +53,7 @@ Full stack Application using MERN stack framework.
     -	Resource Profile
     -	Materials Availability and Cost
     -	Customer Information, billing, work orders
--	API documentation using swagger
+-	API documentation using swagger http://localhost:5000/api-docs/
 -	Application testing using Mocha and/or Chai
 -	Database – MongoDB 
     -	To store API data

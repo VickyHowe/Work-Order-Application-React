@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const User = require('../models/User');
 const Notifications = require('../models/Notifications');
+const UserProfile = require('../models/UserProfile'); 
 const authMiddleware = require('../middleware/authMiddleware');
 
 /**
@@ -23,10 +25,6 @@ const authMiddleware = require('../middleware/authMiddleware');
  *           schema:
  *             type: object
  *             properties:
- *               user:
- *                 type: string
- *                 description: The ID of the user associated with the notification
- *                 example: 60d5ec49d5f6c8b6d4f1e2b3
  *               message:
  *                 type: string
  *                 description: The notification message
@@ -52,9 +50,22 @@ const authMiddleware = require('../middleware/authMiddleware');
  */
 router.post('/', authMiddleware, async (req, res) => {
     try {
-        const notification = new Notifications(req.body);
+        const { message } = req.body;
+        const userId = req.user.id; // Assuming the user ID is available in the request after authentication
+
+        // Create a new notification with the user reference
+        const notification = new Notifications({
+            user: userId, // Use the authenticated user's ID
+            message,
+            isRead: req.body.isRead || false,
+            notificationDate: req.body.notificationDate || Date.now()
+        });
+
         await notification.save();
-        res.status(201).json(notification);
+        res.status(201).json({
+            ...notification.toObject(),
+            username: req.user.username // Include the username in the response
+        });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -80,8 +91,11 @@ router.post('/', authMiddleware, async (req, res) => {
  */
 router.get('/', authMiddleware, async (req, res) => {
     try {
-        const notifications = await Notifications.find().populate('user');
-        res.json(notifications);
+        const notifications = await Notifications.find().populate('user', 'username'); 
+        res.json(notifications.map(notification => ({
+            ...notification.toObject(),
+            username: notification.user ? notification.user.username : null 
+        })));
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -107,10 +121,6 @@ router.get('/', authMiddleware, async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               user:
- *                 type: string
- *                 description: The ID of the user associated with the notification
- *                 example: 60d5ec49d5f6c8b6d4f1e2b3
  *               message:
  *                 type: string
  *                 description: The notification message
@@ -128,7 +138,7 @@ router.get('/', authMiddleware, async (req, res) => {
  *       200:
  *         description: Notification updated successfully
  *         content:
- *           application /json:
+ *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Notification'
  *       400:
@@ -136,7 +146,10 @@ router.get('/', authMiddleware, async (req, res) => {
  */
 router.put('/:id', authMiddleware, async (req, res) => {
     try {
-        const notification = await Notifications.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const notification = await Notifications .findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!notification) {
+            return res.status(404).json({ message: 'Notification not found' });
+        }
         res.json(notification);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -164,7 +177,10 @@ router.put('/:id', authMiddleware, async (req, res) => {
  */
 router.delete('/:id', authMiddleware, async (req, res) => {
     try {
-        await Notifications.findByIdAndDelete(req.params.id);
+        const notification = await Notifications.findByIdAndDelete(req.params.id);
+        if (!notification) {
+            return res.status(404).json({ message: 'Notification not found' });
+        }
         res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -192,6 +208,9 @@ router.delete('/:id', authMiddleware, async (req, res) => {
  *         isRead:
  *           type: boolean
  *           description: Indicates whether the notification has been read
+ *         username:
+ *           type: string
+ *           description: The username of the user associated with the notification
  */
 
 module.exports = router;

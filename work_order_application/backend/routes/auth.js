@@ -3,7 +3,8 @@ const router = express.Router();
 const User = require('../models/User'); 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const authMiddleware = require('../middleware/authMiddleware'); // Adjust the path as necessary
+const authMiddleware = require('../middleware/authMiddleware'); 
+const UserProfile = require('../models/UserProfile');
 
 /**
  * @swagger
@@ -49,7 +50,7 @@ router.post('/register', async (req, res) => {
 
     try {
         // Check if the user already exists
-        const existingUser   = await User.findOne({ email });
+        const existingUser  = await User.findOne({ email });
         if (existingUser ) {
             return res.status(400).json({ message: 'User  already exists' });
         }
@@ -66,7 +67,14 @@ router.post('/register', async (req, res) => {
         });
         await user.save();
 
-        res.status(201).json({ message: 'User  created successfully' });
+        // Create a new user profile
+        
+        const userProfile = new UserProfile({
+            user: user._id, // Reference to the User model
+        });
+        await userProfile.save();
+
+        res.status(201).json({ message: `User  ${username} was created successfully` });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -103,7 +111,7 @@ router.post('/register', async (req, res) => {
  *               properties:
  *                 token:
  *                   type: string
- *                   description: The JWT token
+ *                   description: JWT token
  *       400:
  *         description: Invalid credentials
  */
@@ -173,30 +181,31 @@ router.post('/login', async (req, res) => {
  *       200:
  *         description: Profile updated successfully
  *       400:
- *         description: User not found
+ *         description: User profile not found
  *       500:
  *         description: Server error
  */
 router.put('/profile', authMiddleware, async (req, res) => {
     const { firstName, lastName, phoneNumber, address, city, province, postalCode } = req.body;
-    const userId = req.user.id; // Use req.user.id instead of req.user._id
+    const userId = req.user.id; 
 
     try {
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(400).json({ message: 'User  not found' });
+        // Find the user profile by user ID
+        const userProfile = await UserProfile.findOne({ user: userId });
+        if (!userProfile) {
+            return res.status(400).json({ message: 'User  profile not found' });
         }
 
         // Update user profile information
-        user.firstName = firstName;
-        user.lastName = lastName;
-        user.phoneNumber = phoneNumber;
-        user.address = address;
-        user.city = city;
-        user.province = province;
-        user.postalCode = postalCode;
+        userProfile.firstName = firstName;
+        userProfile.lastName = lastName;
+        userProfile.phoneNumber = phoneNumber;
+        userProfile.address = address;
+        userProfile.city = city;
+        userProfile.province = province;
+        userProfile.postalCode = postalCode;
 
-        await user.save();
+        await userProfile.save(); // Save the updated profile
         res.json({ message: 'Profile updated successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });

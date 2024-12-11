@@ -6,6 +6,11 @@ const postalCodeRegex = /^[A-Za-z]\d[A-Za-z] ?\d[A-Za-z]\d$/;
 const provinceRegex = /^[A-Za-z\s]+$/;
 
 const userProfileSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     firstName: {
         type: String,
         required: false,
