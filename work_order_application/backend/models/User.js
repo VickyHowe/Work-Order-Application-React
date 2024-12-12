@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const userSchema = new mongoose.Schema({
-
     username: {
         type: String,
         required: true,
@@ -24,6 +23,11 @@ const userSchema = new mongoose.Schema({
             message: props => `${props.value} is not a valid email!`
         }
     },
+    role: { 
+        type: String,
+        ref: 'Role',
+        required: true
+    }
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('User ', userSchema);

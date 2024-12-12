@@ -7,7 +7,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 /**
  * @swagger
  * tags:
- *   name: UserProfiles
+ *   name: User Profiles
  *   description: API for managing user profiles
  */
 
@@ -191,7 +191,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
  * /api/userprofiles/{id}:
  *   delete:
  *     summary: Delete a user profile
- *     tags: [User  Profiles]
+ *     tags: [User Profiles]
  *     parameters:
  *       - in: path
  *         name: id

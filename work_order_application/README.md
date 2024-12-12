@@ -1,6 +1,6 @@
 # Work-Order-Application-React
 ### In Development
-A Work Order Software Cross Platform Application. This application links customer and business communication for work-order maintenance, creation and communication.
+A Work Order Software Cross Platform Application. This application links customer and business communication for work-order maintenance, creation and status.
 
 
 ## Target Audience
@@ -58,6 +58,15 @@ Full stack Application using MERN stack framework.
 -	Database – MongoDB 
     -	To store API data
 
+#### Models
+- Permission Model
+    - Define individual permissions that can be granted
+- Role Model
+    - Define roles and associates them with permissions
+- User Model
+    - Define users and associates them with permissions
+- User Profile Model
+    - Define user profiles and associates them with users
 
 ### Hosting
 Render and MongoDB
@@ -95,3 +104,12 @@ PORT= REPLACE THIS WITH A PORT
 
 JWT_SECRET=your_generated_secret_here
 ```
+- navigate to the `backend/scripts` folder and run the setup.js script to populate initial roles and permissions into database
+```
+node setup.js
+```
+the default Admin credentials are;    
+username: 'admin'
+email: 'admin@example.com'
+password: 'admin123'
+These can be changed in `/scripts/setup.js`

@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Notifications = require('../models/Notifications');
 const UserProfile = require('../models/UserProfile'); 
 const authMiddleware = require('../middleware/authMiddleware');
+const permissionMiddleware = require('../middleware/permissionMiddleware'); 
 
 /**
  * @swagger
@@ -48,7 +49,7 @@ const authMiddleware = require('../middleware/authMiddleware');
  *       400:
  *         description: Bad request
  */
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, permissionMiddleware(['create_notifications']), async (req, res) => {
     try {
         const { message } = req.body;
         const userId = req.user.id; // Assuming the user ID is available in the request after authentication
@@ -89,7 +90,7 @@ router.post('/', authMiddleware, async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, permissionMiddleware(['view_notifications']), async (req, res) => {
     try {
         const notifications = await Notifications.find().populate('user', 'username'); 
         res.json(notifications.map(notification => ({
@@ -144,10 +145,10 @@ router.get('/', authMiddleware, async (req, res) => {
  *       400:
  *         description: Bad request
  */
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', authMiddleware, permissionMiddleware(['edit_notifications']), async (req, res) => {
     try {
-        const notification = await Notifications .findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!notification) {
+        const notification = await Notifications.findByIdAndUpdate(req.params.id, req.body, { new: true });
+ if (!notification) {
             return res.status(404).json({ message: 'Notification not found' });
         }
         res.json(notification);
@@ -175,7 +176,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, permissionMiddleware(['delete_notifications']), async (req, res) => {
     try {
         const notification = await Notifications.findByIdAndDelete(req.params.id);
         if (!notification) {

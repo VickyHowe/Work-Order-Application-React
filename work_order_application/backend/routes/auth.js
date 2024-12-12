@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const authMiddleware = require('../middleware/authMiddleware'); 
 const UserProfile = require('../models/UserProfile');
+const Role = require('../models/Role');
 
 /**
  * @swagger
@@ -31,6 +32,10 @@ const UserProfile = require('../models/UserProfile');
  *                 type: string
  *                 description: The user's password
  *                 example: password123
+ *               role:
+ *                 type: string
+ *                 description: The user's role name
+ *                 example: Customer
  *     responses:
  *       201:
  *         description: User created successfully
@@ -46,13 +51,13 @@ const UserProfile = require('../models/UserProfile');
  *         description: User already exists or validation error
  */
 router.post('/register', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, role } = req.body;
 
     try {
         // Check if the user already exists
-        const existingUser  = await User.findOne({ email });
-        if (existingUser ) {
-            return res.status(400).json({ message: 'User  already exists' });
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User already exists' });
         }
 
         // Hash the password
@@ -64,17 +69,19 @@ router.post('/register', async (req, res) => {
             username,
             email,
             password: hashedPassword,
+            role: role || 'Customer'
         });
         await user.save();
 
         // Create a new user profile
-        
         const userProfile = new UserProfile({
-            user: user._id, // Reference to the User model
+            user: user._id,
         });
         await userProfile.save();
 
-        res.status(201).json({ message: `User  ${username} was created successfully` });
+        // Generate a JWT token with the user's role
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.status(201).json({ message: `User ${username} was created successfully`, token });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -129,7 +136,7 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.json({ token });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -177,17 +184,24 @@ router.post('/login', async (req, res) => {
  *                 type: string
  *                 description: The user's postal code
  *                 example: A1A 1A1
+ *               role:
+ *                 type: string
+ *                 description: The user's role name
+ *                 example: Admin
  *     responses:
  *       200:
  *         description: Profile updated successfully
  *       400:
  *         description: User profile not found
+ *       403:
+ *         description: Forbidden, insufficient permissions
  *       500:
  *         description: Server error
  */
 router.put('/profile', authMiddleware, async (req, res) => {
-    const { firstName, lastName, phoneNumber, address, city, province, postalCode } = req.body;
+    const { firstName, lastName, phoneNumber, address, city, province, postalCode, role } = req.body;
     const userId = req.user.id; 
+    const requestingUser  = await User.findById(userId);
 
     try {
         // Find the user profile by user ID
@@ -205,7 +219,19 @@ router.put('/profile', authMiddleware, async (req, res) => {
         userProfile.province = province;
         userProfile.postalCode = postalCode;
 
-        await userProfile.save(); // Save the updated profile
+        // Check if the requesting user has permission to update the role
+        if (role) {
+            if (requestingUser .role !== 'Admin' && requestingUser .role !== 'Manager') {
+                return res.status(403).json({ message: 'Forbidden, insufficient permissions' });
+            }
+            const userToUpdate = await User.findById(userId);
+            if (userToUpdate) {
+                userToUpdate.role = role;
+                await userToUpdate.save();
+            }
+        }
+
+        await userProfile.save(); 
         res.json({ message: 'Profile updated successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });

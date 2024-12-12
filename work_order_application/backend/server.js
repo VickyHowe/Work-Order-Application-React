@@ -5,10 +5,10 @@ const express = require("express");
 const cors = require('cors');
 const connectDB = require('./config/db');
 const path = require('path');
-// const router = express.Router();
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-
+const User = require('./models/User'); 
+const Role = require('./models/Role'); 
 /**
  * Import Routes
  */
@@ -93,7 +93,6 @@ app.use('/api/schedules', scheduleRoutes);
 app.use('/api/skillsets', skillSetRoutes);
 app.use('/api/userprofiles', userProfileRoutes);
 app.use('/api/workorderhistories', workOrderHistoryRoutes);
-
 
 
 app.listen(port, () => console.log(`server running on port ${port}`));
