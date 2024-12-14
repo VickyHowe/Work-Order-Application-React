@@ -1,33 +1,22 @@
-const mongoose = require('mongoose');
+const Mongoose = require("mongoose")
+const UserSchema = new Mongoose.Schema({
+  username: {
+    type: String,
+    unique: true,
+    required: true,
+  },
+  password: {
+    type: String,
+    minlength: 6,
+    required: true,
+  },
+  role: {
+    type: String,
+    default: "Customer",
+    required: true,
+  },
+})
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const User = Mongoose.model("user", UserSchema)
 
-const userSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        validate: {
-            validator: function(v) {
-                return emailRegex.test(v);
-            },
-            message: props => `${props.value} is not a valid email!`
-        }
-    },
-    role: { 
-        type: String,
-        ref: 'Role',
-        required: true
-    }
-});
-
-module.exports = mongoose.model('User ', userSchema);
+module.exports = User

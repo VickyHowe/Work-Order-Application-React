@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const connectDB = require('../config/db'); 
 const User = require('../models/User'); 
 const Role = require('../models/Role'); 
-const Permission = require('../models/Permissions'); 
+const Permission = require('../models/Permissions'); // Ensure this is the correct path
 const bcrypt = require('bcryptjs'); 
 
 const rolesAndPermissions = [
@@ -57,7 +57,7 @@ const createPermissions = async () => {
 async function setupInitialData() {
     try {
         // Create permissions first
-        await createPermissions();
+        const createdPermissions = await createPermissions();
 
         for (const roleData of rolesAndPermissions) {
             const existingRole = await Role.findOne({ roleName: roleData.roleName });
@@ -82,15 +82,15 @@ async function setupInitialData() {
         }
 
         // Check if admin user exists
-        const adminUser   = await User.findOne({ email: 'admin@example.com' }); // Change to your desired admin email
-        if (!adminUser  ) {
+        const adminUser  = await User.findOne({ email: 'admin@example.com' }); // Change to your desired admin email
+        if (!adminUser ) {
             const adminRole = await Role.findOne({ roleName: 'Admin' }); 
             const hashedPassword = await bcrypt.hash('admin123', 10); 
             const user = new User({
                 username: 'admin',
                 email: 'admin@example.com', // Change to your desired admin email
                 password: hashedPassword, 
-                role: adminRole.roleName 
+                role: adminRole._id // Reference the role ID instead of the role name
             });
             await user.save();
             console.log('Admin user created');
