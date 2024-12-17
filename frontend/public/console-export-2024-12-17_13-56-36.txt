@@ -1,0 +1,43 @@
+Uncaught TypeError: profile is undefined
+    UserProfile UserProfile.jsx:120
+    React 11
+    workLoop scheduler.development.js:266
+    flushWork scheduler.development.js:239
+    performWorkUntilDeadline scheduler.development.js:533
+    handleUpdate UserProfile.jsx:88
+    React 23
+    <anonymous> main.jsx:6
+UserProfile.jsx:120:24
+Uncaught TypeError: profile is undefined
+    UserProfile UserProfile.jsx:120
+    React 12
+    workLoop scheduler.development.js:266
+    flushWork scheduler.development.js:239
+    performWorkUntilDeadline scheduler.development.js:533
+    handleUpdate UserProfile.jsx:88
+    React 23
+    <anonymous> main.jsx:6
+UserProfile.jsx:120:24
+The above error occurred in the <UserProfile> component:
+
+UserProfile@http://localhost:5173/src/components/UserProfile.jsx?t=1734472513738:21:21
+ProtectedRoute@http://localhost:5173/src/components/ProtectedRoute.jsx:19:24
+RenderedRoute@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=02b8d100:5360:23
+Routes@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=02b8d100:6089:16
+div
+Router@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=02b8d100:6032:16
+BrowserRouter@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=02b8d100:8072:23
+App@http://localhost:5173/src/App.jsx?t=1734471675646:35:35
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries. react-dom.development.js:18704:14
+Uncaught TypeError: profile is undefined
+    UserProfile UserProfile.jsx:120
+    React 9
+    workLoop scheduler.development.js:266
+    flushWork scheduler.development.js:239
+    performWorkUntilDeadline scheduler.development.js:533
+    handleUpdate UserProfile.jsx:88
+    React 23
+    <anonymous> main.jsx:6
+UserProfile.jsx:120:24

@@ -1,111 +1,102 @@
 require('dotenv').config({ path: '../.env' });
-const mongoose = require('mongoose'); 
+const mongoose = require('mongoose');
+const User = require('../models/User');
+const Role = require('../models/Role');
+const bcrypt = require('bcryptjs');
 const connectDB = require('../config/db'); 
-const User = require('../models/User'); 
-const Role = require('../models/Role'); 
-const Permission = require('../models/Permissions'); // Ensure this is the correct path
-const bcrypt = require('bcryptjs'); 
 
-const rolesAndPermissions = [
-    {
-        roleName: 'Admin',
-        description: 'Administrator role with full permissions',
-        permissions: ['create_notifications', 'view_notifications', 'edit_notifications', 'delete_notifications', 'manage_users', 'manage_roles']
-    },
-    {
-        roleName: 'Customer',
-        description: 'Customer role with limited permissions',
-        permissions: ['view_notifications']
-    },
-    {
-        roleName: 'Manager',
-        description: 'Manager role with permissions to manage teams',
-        permissions: ['view_notifications', 'create_notifications']
-    },
-    {
-        roleName: 'Employee',
-        description: 'Employee role with basic permissions',
-        permissions: ['view_notifications']
-    }
-];
-
-const createPermissions = async () => {
-    const permissions = [
-        { name: 'create_notifications' },
-        { name: 'view_notifications' },
-        { name: 'edit_notifications' },
-        { name: 'delete_notifications' },
-        { name: 'manage_users' },
-        { name: 'manage_roles' }
-    ];
-
-    const createdPermissions = [];
-    for (const perm of permissions) {
-        const existingPerm = await Permission.findOne({ name: perm.name });
-        if (!existingPerm) {
-            const newPerm = new Permission(perm);
-            await newPerm.save();
-            createdPermissions.push(newPerm);
-            console.log(`Permission ${perm.name} created`);
-        } else {
-            createdPermissions.push(existingPerm);
-        }
-    }
-    return createdPermissions;
+const adminUser  = {
+    username: 'admin',
+    email: 'admin@example.com', // Add email address
+    password: 'admin123', // Use a strong password in production
+    securityQuestion: "What is your mother's maiden name?", // Example security question
+    securityQuestionAnswer: "Smith" // Example answer to the security question
 };
 
-async function setupInitialData() {
+const roles = [
+    { 
+        name: 'admin', 
+        canAssign: ['*'], 
+        permissions: [
+            { resource: '*', action: '*' }
+        ] 
+    },
+    { 
+        name: 'manager', 
+        canAssign: ['employee', 'customer'], 
+        permissions: [
+            { resource: 'write', action: 'write_access' }, 
+            { resource: 'delete', action: 'delete_access' }
+        ] 
+    },
+    { 
+        name: 'employee', 
+        canAssign: [], 
+        permissions: [{ resource: 'read', action: 'read_only' }] 
+    },
+    { 
+        name: 'customer', 
+        canAssign: [], 
+        permissions: [{ resource: 'read', action: 'read_only' }] 
+    },
+];
+
+const seedAdminUser  = async () => {
     try {
-        // Create permissions first
-        const createdPermissions = await createPermissions();
+        // Connect to the database
+        await connectDB(); 
 
-        for (const roleData of rolesAndPermissions) {
-            const existingRole = await Role.findOne({ roleName: roleData.roleName });
+        // Create default roles
+        for (const roleData of roles) {
+            const existingRole = await Role.findOne({ name: roleData.name });
             if (!existingRole) {
-                const role = new Role({
-                    roleName: roleData.roleName,
-                    description: roleData.description,
-                    permissions: [] 
-                });
+                console.log('Creating role:', roleData); // Log the role data
+                const role = new Role(roleData);
                 await role.save();
-                console.log(`${roleData.roleName} role created`);
-
-                // Create permissions for the role
-                for (const permissionName of roleData.permissions) {
-                    let permission = await Permission.findOne({ name: permissionName });
-                    if (permission) {
-                        role.permissions.push(permission._id); 
-                    }
-                }
-                await role.save(); 
+                console.log(`Role '${roleData.name}' created successfully.`);
+            } else {
+                console.log(`Role '${roleData.name}' already exists.`);
             }
         }
 
-        // Check if admin user exists
-        const adminUser  = await User.findOne({ email: 'admin@example.com' }); // Change to your desired admin email
-        if (!adminUser ) {
-            const adminRole = await Role.findOne({ roleName: 'Admin' }); 
-            const hashedPassword = await bcrypt.hash('admin123', 10); 
-            const user = new User({
-                username: 'admin',
-                email: 'admin@example.com', // Change to your desired admin email
-                password: hashedPassword, 
-                role: adminRole._id // Reference the role ID instead of the role name
-            });
-            await user.save();
-            console.log('Admin user created');
+        // Check if the admin user already exists
+        const existingAdmin = await User.findOne({ username: adminUser .username });
+        if (existingAdmin) {
+            console.log('Admin user already exists.');
+            return;
         }
+
+        // Create a new admin user
+        const hashedPassword = await bcrypt.hash(adminUser .password, 10);
+        const hashedSecurityQuestionAnswer = await bcrypt.hash(adminUser .securityQuestionAnswer, 10); // Hash the security question answer
+
+        const adminRole = await Role.findOne({ name: 'admin' });
+        console.log('Admin Role:', adminRole); 
+        
+        const newAdmin = new User({
+            username: adminUser .username,
+            email: adminUser .email, // Include email address
+            password: hashedPassword,
+            securityQuestion: adminUser .securityQuestion, // Add security question
+            securityQuestionAnswer: hashedSecurityQuestionAnswer, // Add hashed answer
+            role: adminRole._id, 
+        });
+
+        await newAdmin.save();
+        console.log('Admin user created successfully.');
     } catch (error) {
-        console.error('Error seeding initial data:', error);
+        console.error('Error seeding admin user:', error);
     } finally {
+        // Close the database connection
         mongoose.connection.close();
     }
-}
+};
 
 connectDB()
     .then(() => {
         console.log('MongoDB connected successfully');
-        return setupInitialData(); 
+        // Run the seed function
+        seedAdminUser ();
     })
     .catch(err => {
         console.error('MongoDB connection error:', err);

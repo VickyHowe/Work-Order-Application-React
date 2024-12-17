@@ -3,51 +3,66 @@ import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
     const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState(''); // State for error message
-    const navigate = useNavigate(); // Initialize the useNavigate hook
+    const [securityQuestion, setSecurityQuestion] = useState('');
+    const [securityQuestionAnswer, setSecurityQuestionAnswer] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+
+    // Function to validate email format
+    const isValidEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(''); // Reset error message before making the request
-        const response = await fetch('http://localhost:5000/api/auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password }),
-        });
-    
-        if (response.ok) {
-            const data = await response.json();
-            console.log(data);
-            // Set user data in state (assuming setUser  is passed as a prop)
-            // setUser ({ id: data.user.id, username: data.user.username });
-            // Redirect to the dashboard upon successful registration
-            navigate('/dashboard');
-        } else {
-            // Handle error response
-            const errorData = await response.json();
-            console.error('Registration failed:', errorData);
-            
-            // Extract a user-friendly error message
-            if (errorData.error) {
-                // Check if the error is a duplicate key error
-                if (errorData.error.includes('duplicate key error')) {
-                    setError('Username already exists. Please choose a different username.');
-                } else {
-                    setError(errorData.message || 'Registration failed. Please try again.');
-                }
+        setError('');
+
+        // Validate email format
+        if (!isValidEmail(email)) {
+            setError('Please enter a valid email address.');
+            return;
+        }
+
+        // Prepare the data to be sent to the server
+        const userData = {
+            username,
+            email, 
+            password,
+            securityQuestion,
+            securityQuestionAnswer,
+        };
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data);
+                navigate('/dashboard');
             } else {
-                setError('Registration failed. Please try again.');
+                const errorData = await response.json();
+                console.error('Registration failed:', errorData);
+                setError(errorData.message || 'Registration failed. Please try again.');
             }
+        } catch (err) {
+            console.error('An error occurred:', err);
+            setError('An unexpected error occurred. Please try again later.');
         }
     };
 
     return (
         <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-10">
             <h2 className="text-2xl mb-4">Register</h2>
-            {error && <p className="text-red-500 mb-4">{error}</p>} {/* Display error message */}
+            {error && <p className="text-red-500 mb-4">{error}</p>}
             <input
                 type="text"
                 placeholder="Username"
@@ -57,10 +72,34 @@ const Register = () => {
                 required
             />
             <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="border p-2 mb-4 w-full"
+                required
+            />
+            <input
                 type="password"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="border p-2 mb-4 w-full"
+                required
+            />
+            <input
+                type="text"
+                placeholder="Security Question (e.g., What is your mother's maiden name?)"
+                value={securityQuestion}
+                onChange={(e) => setSecurityQuestion(e.target.value)}
+                className="border p-2 mb-4 w-full"
+                required
+            />
+            <input
+                type="text"
+                placeholder="Security Question Answer"
+                value={securityQuestionAnswer}
+                onChange={(e) => setSecurityQuestionAnswer(e.target.value)}
                 className="border p-2 mb-4 w-full"
                 required
             />

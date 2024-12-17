@@ -1,8 +1,15 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Navbar, Nav, Button } from "react-bootstrap";
 
 const CustomNavbar = ({ user, onLogout }) => {
+  const navigate = useNavigate(); 
+
+  const handleLogout = () => {
+    onLogout(); 
+    navigate('/login'); 
+  };
+
   return (
     <Navbar className="bg-blue-500" expand="lg">
       <div className="container-fluid">
@@ -26,7 +33,7 @@ const CustomNavbar = ({ user, onLogout }) => {
               <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
             )}
             {user && (
-              <Button variant="link" onClick={onLogout}>Logout</Button>
+              <Button variant="link" onClick={handleLogout}>Logout</Button>
             )}
           </Nav>
         </Navbar.Collapse>

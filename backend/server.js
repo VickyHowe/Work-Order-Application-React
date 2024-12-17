@@ -1,65 +1,61 @@
 require('dotenv').config({
-    path: './.env'
-  });
+  path: './.env'
+});
 const express = require("express");
-const router = express.Router()
 const cors = require('cors');
 const connectDB = require('./config/db');
 const path = require('path');
 
-
+/**
+* Import Routes
+*/
+const authRoute = require('./routes/Auth/authRoutes'); 
+const userRoute = require('./routes/User/userRoutes'); 
+const permissionRoute = require('./routes/Permissions/permissionRoutes'); 
+const roleRoute = require('./routes/Roles/roleRoutes'); 
+const errorHandler = require('./middleware/errorHandler');
 
 /**
- * Import Routes
- */
-const authRoute = require('./routes/Auth/route')
-
-
-/**
- * Swagger definition
- */
-
-
-
-/**
- * General Setup
- */
-
+* General Setup
+*/
 const app = express();
 const port = process.env.PORT || 5000;
 
+/**
+* Middleware
+*/
+app.use(cors({
+  origin: 'http://localhost:5173', // Replace with your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+}));
+
 
 /**
- * Middleware
- */
+* Middleware
+*/
 app.use(cors());
 app.use(express.json());
 
-
 /**
- * Connect to Database
- */
+* Connect to Database
+*/
 connectDB();
 
-
 /**
- * Connect Paths
- */
-
+* Connect Paths
+*/
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 /**
- * Routes
- */
-app.use("/api/auth", authRoute);
+* Routes
+*/
+app.use("/api/auth", authRoute); 
+app.use("/api/users", userRoute);
+app.use("/api/permissions", permissionRoute); 
+app.use("/api/roles", roleRoute); 
 
-
-
-app.listen(port, () => console.log(`server running on port ${port}`));
+app.listen(port, () => console.log(`Server running on port ${port}`));
 
 // Handling Error
-process.on("unhandledRejection", err => {
-    console.log(`An error occurred: ${err.message}`)
-    server.close(() => process.exit(1))
-  })
+app.use(errorHandler);
