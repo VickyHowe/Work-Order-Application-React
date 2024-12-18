@@ -39,7 +39,6 @@ const RequestPasswordReset = () => {
         "Security question answered correctly. You can now reset your password."
       ) {
         navigate(`/reset-password/${response.data.token}`);
-        alert("Incorrect answer to the security question");
       }
     } catch (error) {
       alert("Error verifying security question answer");

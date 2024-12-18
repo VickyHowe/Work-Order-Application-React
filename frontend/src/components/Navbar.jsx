@@ -3,11 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { Navbar, Nav, Button } from "react-bootstrap";
 
 const CustomNavbar = ({ user, onLogout }) => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    onLogout(); 
-    navigate('/login'); 
+    onLogout();
+    navigate("/login");
   };
 
   return (
@@ -19,9 +19,11 @@ const CustomNavbar = ({ user, onLogout }) => {
         <Navbar.Toggle aria-controls="navbarNav" />
         <Navbar.Collapse id="navbarNav">
           <Nav className="ml-auto">
-            <Nav.Link as={Link} to="/" active>
-              Home
-            </Nav.Link>
+            {user && (
+              <Nav.Link as={Link} to="/dashboard">
+                Dashboard
+              </Nav.Link>
+            )}
             <Nav.Link as={Link} to="/login">
               Login
             </Nav.Link>
@@ -30,10 +32,14 @@ const CustomNavbar = ({ user, onLogout }) => {
             </Nav.Link>
             {/* Only render the Profile link if the user is logged in */}
             {user && (
-              <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
+              <Nav.Link as={Link} to="/profile">
+                Profile
+              </Nav.Link>
             )}
             {user && (
-              <Button variant="link" onClick={handleLogout}>Logout</Button>
+              <Button variant="link" onClick={handleLogout}>
+                Logout
+              </Button>
             )}
           </Nav>
         </Navbar.Collapse>

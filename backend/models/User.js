@@ -1,12 +1,13 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    securityQuestion: { type: String, required: true }, // e.g., "What is your mother's maiden name?"
-    securityQuestionAnswer: { type: String, required: true }, // Store hashed answer for security
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  securityQuestion: { type: String, required: true },
+  securityQuestionAnswer: { type: String, required: true },
+  role: { type: mongoose.Schema.Types.ObjectId, ref: "Role" },
+  userProfile: { type: mongoose.Schema.Types.ObjectId, ref: "User Profile" },
 });
-
 const User = mongoose.model("User ", userSchema);
 module.exports = User;

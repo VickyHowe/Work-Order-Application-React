@@ -35,3 +35,4 @@ exports.createRole = async (req, res) => {
         return res.status(500).json({ message: "An internal server error occurred" });
     }
 };
+

@@ -1,11 +1,18 @@
 const roleCheck = (allowedRoles, action) => {
     return (req, res, next) => {
-        console.log('Role Check Middleware Called'); // Log entry into middleware
         const userRole = req.user.role; // Assuming req.user is populated with the authenticated user's data
 
+        // Log the user's role
+        console.log('User  Role:', userRole);
+
+        // Check if userRole is defined and has canAssign property
         if (!userRole || !Array.isArray(userRole.canAssign)) {
+            console.log('User  Role canAssign:', userRole ? userRole.canAssign : 'Role not found');
             return res.status(403).json({ message: "You do not have permission to perform this action" });
         }
+
+        // Log allowed roles
+        console.log('Allowed Roles:', allowedRoles);
 
         // Check if the user's role can perform the action
         const hasRolePermission = allowedRoles.some(role => 
@@ -30,7 +37,9 @@ const roleCheck = (allowedRoles, action) => {
             return res.status(403).json({ message: "You do not have permission to perform this action" });
         }
 
+        // If all checks pass, proceed to the next middleware
         next();
     };
 }
+
 module.exports = roleCheck;

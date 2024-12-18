@@ -62,4 +62,4 @@ const userProfileSchema = new mongoose.Schema({
     },
 }, { timestamps: true }); 
 
-module.exports = mongoose.model('User Profile', userProfileSchema);
+module.exports = mongoose.model('UserProfile', userProfileSchema);

@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const UserProfile = require("../models/UserProfile"); 
+const Role = require("../models/Role"); // Import the Role model
 const bcrypt = require("bcryptjs");
 const { generateToken } = require('../utils/tokenGenerator'); 
 const AppError = require('../utils/AppError');
@@ -17,8 +18,8 @@ exports.register = async (req, res, next) => {
     }
 
     try {
-        const existingUser  = await User.findOne({ username });
-        if (existingUser ) {
+        const existingUser   = await User.findOne({ username });
+        if (existingUser  ) {
             return next(new AppError("Username already exists", 400));
         }
 
@@ -31,6 +32,12 @@ exports.register = async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const hashedAnswer = await bcrypt.hash(securityQuestionAnswer, 10);
 
+        // Find the default role (e.g., "Customer")
+        const defaultRole = await Role.findOne({ name: "customer" }); // Change "Customer" to your default role name
+        if (!defaultRole) {
+            return next(new AppError("Default role not found", 500));
+        }
+
         // Create a new user
         const user = await User.create({
             username,
@@ -38,28 +45,30 @@ exports.register = async (req, res, next) => {
             password: hashedPassword,
             securityQuestion,
             securityQuestionAnswer: hashedAnswer,
+            role: defaultRole._id, // Assign the default role
         });
 
         // Create a default user profile
         const userProfile = new UserProfile({
             user: user._id, 
-            firstName: '',
-            lastName: '',
-            phoneNumber: '',
-            address: '',
-            city: '',
-            province: '',
-            postalCode: ''
+            firstName: 'DefaultFirstName', 
+            lastName: 'DefaultLastName', 
+            phoneNumber: '1111111111', 
+            address: 'defaultAddress', 
+            city: 'defaultCity', 
+            province: 'defaultProvince', 
+            postalCode: 'a1a1a1' 
         });
 
         // Save the user profile to the database
         await userProfile.save();
 
         return res.status(201).json({
-            message: "User created successfully",
+            message: "User  created successfully",
             user: { id: user._id },
         });
     } catch (err) {
+        console.log(err);
         return next(new AppError("An internal server error occurred", 500));
     }
 };
@@ -72,7 +81,7 @@ exports.login = async (req, res, next) => {
     }
 
     try {
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ username }).populate('role');
         if (!user) {
             return next(new AppError("User not found", 401));
         }
@@ -88,7 +97,7 @@ exports.login = async (req, res, next) => {
 
         return res.status(200).json({
             message: "Login successful",
-            user: { id: user._id },
+            user: { id: user._id, role: user.role.name },
             token,
         });
     } catch (error) {

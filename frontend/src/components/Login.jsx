@@ -7,12 +7,11 @@ const Login = ({ setUser  }) => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null); 
-
+    
         try {
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
                 method: 'POST',
@@ -21,19 +20,29 @@ const Login = ({ setUser  }) => {
                 },
                 body: JSON.stringify({ username, password }),
             });
-
+    
             const data = await response.json();
-
+    
             if (response.ok && data.token) {
-                setUser ({ id: data.user.id, username });
+                // Set the user state with the role directly
+                setUser ({
+                    id: data.user.id,
+                    username, // Assuming you have a username variable
+                    role: data.user.role // This is now a string
+                });
                 localStorage.setItem('token', data.token);
-                navigate('/dashboard');
+                localStorage.setItem('user', JSON.stringify({
+                    id: data.user.id,
+                    username: data.user.username,
+                    role: data.user.role
+                }));
+                navigate('/Dashboard');
             } else {
-                // Provide more specific error messages based on the response
+                // Handle errors
                 if (data.message) {
                     setError(data.message);
                 } else if (data.error) {
-                    setError(data.error); // Assuming the server sends a specific error field
+                    setError(data.error);
                 } else {
                     setError('Login failed. Please try again.');
                 }

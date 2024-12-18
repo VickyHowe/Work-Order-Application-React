@@ -10,13 +10,13 @@ const authMiddleware = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // Fetch the user from the database without populating the role
-        const user = await User.findById(decoded.id);
+        // Fetch the user from the database and populate the role field
+        const user = await User.findById(decoded.id).populate('role'); // Populate the role field
         if (!user) {
             return res.status(404).json({ message: 'User  not found' });
         }
 
-        req.user = user;
+        req.user = user; // Attach the user object to the request
         // console.log('Authenticated user:', req.user); // Log the authenticated user
         next(); 
     } catch (error) {

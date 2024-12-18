@@ -2,6 +2,7 @@ require('dotenv').config({ path: '../.env' });
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const Role = require('../models/Role');
+const UserProfile = require('../models/UserProfile'); // Import UserProfile model
 const bcrypt = require('bcryptjs');
 const connectDB = require('../config/db'); 
 
@@ -84,6 +85,22 @@ const seedAdminUser  = async () => {
 
         await newAdmin.save();
         console.log('Admin user created successfully.');
+
+        // Create a default user profile for the admin user
+        const defaultProfile = new UserProfile({
+            user: newAdmin._id, // Reference to the admin user
+            firstName: 'Admin', // Default first name
+            lastName: ' User ', // Default last name
+            phoneNumber: '1234567890', // Default phone number (or leave empty if not required)
+            address: '', // Default address
+            city: '', // Default city
+            province: '', // Default province
+            postalCode: 'a1a1a1' // Default postal code (or leave empty if not required)
+        });
+
+        await defaultProfile.save();
+        console.log('Default profile created for admin user.');
+
     } catch (error) {
         console.error('Error seeding admin user:', error);
     } finally {
