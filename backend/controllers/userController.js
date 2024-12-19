@@ -120,12 +120,12 @@ exports.getProfile = async (req, res) => {
         const user = await User.findById(req.user.id) // Assuming req.user is set by authMiddleware
             .select('-password -securityQuestion -securityQuestionAnswer') // Exclude sensitive fields
             .populate('role', 'name') // Populate the role field
-            .populate('userProfile'); // Populate user profile details
 
         if (!user) {
             return res.status(404).json({ message: 'User  not found' });
         }
 
+        const userProfile = await UserProfile.findOne({ user: user._id });
         // Format the user data as needed
         const formattedUser  = {
             _id: user._id,
@@ -135,13 +135,13 @@ exports.getProfile = async (req, res) => {
                 name: user.role.name
             },
             profileDetails: {
-                firstName: user.userProfile?.firstName || '',
-                lastName: user.userProfile?.lastName || '',
-                phoneNumber: user.userProfile?.phoneNumber || '',
-                address: user.userProfile?.address || '',
-                city: user.userProfile?.city || '',
-                province: user.userProfile?.province || '',
-                postalCode: user.userProfile?.postalCode || ''
+                firstName: userProfile?.firstName || '',
+                lastName: userProfile?.lastName || '',
+                phoneNumber: userProfile?.phoneNumber || '',
+                address: userProfile?.address || '',
+                city: userProfile?.city || '',
+                province: userProfile?.province || '',
+                postalCode: userProfile?.postalCode || ''
             }
         };
 

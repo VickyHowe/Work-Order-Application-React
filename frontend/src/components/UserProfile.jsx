@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -30,19 +30,31 @@ const UserProfile = ({ user }) => {
             },
           }
         );
-
-        setProfile(response.data);
+  
+        // Accessing profileDetails from the response
+        const { profileDetails } = response.data;
+  
+        // Set the profile state with the fetched profile details
+        setProfile({
+          firstName: profileDetails.firstName || "",
+          lastName: profileDetails.lastName || "",
+          phoneNumber: profileDetails.phoneNumber || "",
+          address: profileDetails.address || "",
+          city: profileDetails.city || "",
+          province: profileDetails.province || "",
+          postalCode: profileDetails.postalCode || "",
+        });
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch profile");
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchProfile();
   }, []);
 
-  const validateProfile = () => {
+  const validateProfile = useCallback(() => {
     const errors = {};
     if (!profile.firstName) {
       errors.firstName = "First Name is required";
@@ -66,7 +78,7 @@ const UserProfile = ({ user }) => {
       errors.postalCode = "Postal Code is required";
     }
     return errors;
-  };
+  }, [profile]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -91,7 +103,6 @@ const UserProfile = ({ user }) => {
         }
       );
 
-      // Assuming response.data is the updated profile object
       setProfile(response.data);
       alert("Profile updated successfully!");
       setIsEditing(false);
@@ -110,11 +121,25 @@ const UserProfile = ({ user }) => {
     }
   };
 
+  const handleCancel = () => {
+    setIsEditing(false);
+    // Optionally reset the form fields to the original values fetched from the API
+    setProfile({
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+      address: "",
+      city: "",
+      province: "",
+      postalCode: "",
+    });
+  };
+
   if (loading) return <p>Loading...</p>;
 
   return (
     <div className="max-w-md mx-auto mt-10">
-      <h2 className="text-2xl mb-4">User Profile</h2>
+      <h2 className="text-2xl mb-4">User  Profile</h2>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {Object.keys(validationErrors).map((key) => (
         <p key={key} className="text-red-500 mb-4">
@@ -131,6 +156,7 @@ const UserProfile = ({ user }) => {
               setProfile({ ...profile, firstName: e.target.value })
             }
             className="border p-2 mb-4 w-full"
+            aria-label="First Name"
           />
           <input
             type="text"
@@ -140,6 +166,7 @@ const UserProfile = ({ user }) => {
               setProfile({ ...profile, lastName: e.target.value })
             }
             className="border p-2 mb-4 w-full"
+            aria-label="Last Name"
           />
           <input
             type="text"
@@ -149,6 +176,7 @@ const UserProfile = ({ user }) => {
               setProfile({ ...profile, phoneNumber: e.target.value })
             }
             className="border p-2 mb-4 w-full"
+            aria-label="Phone Number"
           />
           <input
             type="text"
@@ -158,6 +186,7 @@ const UserProfile = ({ user }) => {
               setProfile({ ...profile, address: e.target.value })
             }
             className="border p-2 mb-4 w-full"
+            aria-label="Address"
           />
           <input
             type="text"
@@ -165,6 +194,7 @@ const UserProfile = ({ user }) => {
             value={profile.city || ""}
             onChange={(e) => setProfile({ ...profile, city: e.target.value })}
             className="border p-2 mb-4 w-full"
+            aria-label="City"
           />
           <input
             type="text"
@@ -174,6 +204,7 @@ const UserProfile = ({ user }) => {
               setProfile({ ...profile, province: e.target.value })
             }
             className="border p-2 mb-4 w-full"
+            aria-label="Province"
           />
           <input
             type="text"
@@ -183,9 +214,17 @@ const UserProfile = ({ user }) => {
               setProfile({ ...profile, postalCode: e.target.value })
             }
             className="border p-2 mb-4 w-full"
+            aria-label="Postal Code"
           />
           <button type="submit" className="bg-blue-500 text-white p-2">
             Update Profile
+          </button>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="bg-red-500 text-white p-2 ml-4"
+          >
+            Cancel
           </button>
         </form>
       ) : (

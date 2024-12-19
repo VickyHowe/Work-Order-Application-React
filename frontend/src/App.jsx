@@ -10,6 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UserManagement from "./components/UserManagement";
+import TaskList from "./components/Tasklist";
 
 
 const App = () => {
@@ -29,7 +30,9 @@ const App = () => {
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route
             path="/profile"
-            element={<ProtectedRoute element={<UserProfile user={user} />} />}
+            element={<ProtectedRoute element={<UserProfile user={user} />}
+            user={user}
+            />}
           />
           <Route
             path="/Dashboard"
@@ -40,9 +43,12 @@ const App = () => {
               />
             }
           />
+          <Route path="/tasks" element={<ProtectedRoute element={<TaskList />} user={user} />} />
           <Route
             path="/request-password-reset"
             element={<RequestPasswordReset />}
+            user={user}
+            allowedRoles={['employee', 'manager', 'admin']}
           />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route

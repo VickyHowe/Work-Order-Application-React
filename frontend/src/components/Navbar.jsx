@@ -24,13 +24,17 @@ const CustomNavbar = ({ user, onLogout }) => {
                 Dashboard
               </Nav.Link>
             )}
-            <Nav.Link as={Link} to="/login">
-              Login
-            </Nav.Link>
-            <Nav.Link as={Link} to="/register">
-              Register
-            </Nav.Link>
-            {/* Only render the Profile link if the user is logged in */}
+            {!user && (
+              <>
+                <Nav.Link as={Link} to="/login">
+                  Login
+                </Nav.Link>
+                <Nav.Link as={Link} to="/register">
+                  Register
+                </Nav.Link>
+              </>
+            )}
+
             {user && (
               <Nav.Link as={Link} to="/profile">
                 Profile

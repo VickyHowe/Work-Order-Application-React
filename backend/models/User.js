@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   securityQuestion: { type: String, required: true },
   securityQuestionAnswer: { type: String, required: true },
   role: { type: mongoose.Schema.Types.ObjectId, ref: "Role" },
-  userProfile: { type: mongoose.Schema.Types.ObjectId, ref: "User Profile" },
+  userProfile: { type: mongoose.Schema.Types.ObjectId, ref: "UserProfile" },
 });
 const User = mongoose.model("User ", userSchema);
 module.exports = User;
