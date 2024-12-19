@@ -8,13 +8,10 @@ const router = express.Router();
 
 // Task routes
 router.use(authMiddleware);
-router.route('/')
-    .get(taskController.getAllTasks) // Get all tasks
-    .post(roleCheck(['manager', 'admin'], 'create'), taskController.createTask); // Create a new task
 
-router.route('/:id')
-    .put(roleCheck(['manager', 'admin'], 'update'), taskController.updateTask) // Update a task
-    .delete(roleCheck(['manager', 'admin'], 'delete'), taskController.deleteTask); // Delete a task
-
+// Pricelist routes
+router.route('/pricelist')
+    .get(pricelistController.getAllPricelists) // Get all pricelists
+    .post(roleCheck(['manager', 'admin'], 'create'), pricelistController.createPricelist); // Create a new pricelist
 
 module.exports = router;

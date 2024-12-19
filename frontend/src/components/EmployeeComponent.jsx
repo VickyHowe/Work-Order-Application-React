@@ -1,7 +1,7 @@
 import React from 'react';
 import TaskList from './Tasklist';
 
-const UserComponent = () => {
+const EmployeeComponent = () => {
     return (
         <div>
             <h3>User Dashboard</h3>
@@ -12,4 +12,4 @@ const UserComponent = () => {
     );
 };
 
-export default UserComponent;
+export default EmployeeComponent;

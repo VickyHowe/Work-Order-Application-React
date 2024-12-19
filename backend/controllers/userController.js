@@ -76,16 +76,17 @@ exports.updateUserRole = async (req, res) => {
 
 // Delete User
 exports.deleteUser  = async (req, res) => {
-  const { id } = req.body;
-  if (!id) return handleError(res, null, "User  ID must be provided", 400);
+    const { id } = req.params; // Get the user ID from the URL
 
-  try {
-      const result = await User.deleteOne({ _id: id });
-      if (result.deletedCount === 0) return handleError(res, null, "User  not found", 404);
-      return res.status(200).json({ message: "User  successfully deleted" });
-  } catch (error) {
-      return handleError(res, error, "An error occurred while deleting the user");
-  }
+    if (!id) return handleError(res, null, "User  ID must be provided", 400);
+
+    try {
+        const result = await User.deleteOne({ _id: id });
+        if (result.deletedCount === 0) return handleError(res, null, "User  not found", 404);
+        return res.status(200).json({ message: "User  successfully deleted" });
+    } catch (error) {
+        return handleError(res, error, "An error occurred while deleting the user");
+    }
 };
 
 // Update User Profile
@@ -112,6 +113,80 @@ exports.updateProfile = async (req, res, next) => {
       }
       return next(new AppError("An error occurred while updating the profile", 500));
   }
+};
+
+// // Get Specific User 
+// exports.updateUser  = async (req, res) => {
+//     const { id } = req.params;
+//     const { username, email, profileDetails } = req.body;
+  
+//     try {
+//       // Find the user by ID and update their details
+//       const updatedUser  = await User.findByIdAndUpdate(
+//         id,
+//         { username, email, profileDetails },
+//         { new: true, runValidators: true } // Return the updated document and run validators
+//       );
+  
+//       if (!updatedUser ) {
+//         return res.status(404).json({ message: 'User  not found' });
+//       }
+  
+//       res.status(200).json(updatedUser );
+//     } catch (error) {
+//       console.error('Error updating user:', error);
+//       res.status(500).json({ message: 'Server error' });
+//     }
+//   };
+
+// Update Specific user
+exports.updateUser  = async (req, res) => {
+    const { id } = req.params; // Get the user ID from the URL
+    const { username, email, profileDetails } = req.body; // Get the data from the request body
+
+    try {
+        // Find the user by ID and update their details
+        const updatedUser  = await User.findByIdAndUpdate(
+            id,
+            { username, email },
+            { new: true, runValidators: true } // Return the updated document and run validators
+        );
+
+        if (!updatedUser ) {
+            return res.status(404).json({ message: 'User  not found' });
+        }
+
+        // Update the user's profile details
+        const userProfile = await UserProfile.findOneAndUpdate(
+            { user: updatedUser ._id },
+            profileDetails,
+            { new: true, upsert: true, runValidators: true } // Create if not exists
+        );
+
+        // Format the response
+        const response = {
+            _id: updatedUser ._id,
+            username: updatedUser .username,
+            email: updatedUser .email,
+            role: {
+                name: updatedUser .role ? updatedUser .role.name : 'No Role' // Assuming role is populated
+            },
+            profileDetails: {
+                firstName: userProfile?.firstName || '',
+                lastName: userProfile?.lastName || '',
+                phoneNumber: userProfile?.phoneNumber || '',
+                address: userProfile?.address || '',
+                city: userProfile?.city || '',
+                province: userProfile?.province || '',
+                postalCode: userProfile?.postalCode || ''
+            }
+        };
+
+        return res.status(200).json(response);
+    } catch (error) {
+        console.error('Error updating user:', error);
+        return res.status(500).json({ message: 'Server error' });
+    }
 };
 
 // Get User Profile
@@ -154,38 +229,65 @@ exports.getProfile = async (req, res) => {
 
 // Get All Users
 exports.getAllUsers = async (req, res) => {
-  try {
-      // Fetch users and populate the role and user profile details
-      const users = await User.find()
-          .select('-password -securityQuestion -securityQuestionAnswer') // Exclude sensitive fields
-          .populate('role', 'name') // Populate the role field and select only the name
-          .populate('userProfile'); // Populate the user profile details
+    console.log("I am getting all users");
+    try {
+        const users = await User.find()
+            .select('-password -securityQuestion -securityQuestionAnswer')
+            .populate('role', 'name');
 
-      // Log the raw users data for debugging
-      console.log('Raw users data:', users);
+        if (!users || users.length === 0) {
+            console.warn('No users found in the database.');
+            return res.status(404).json({ message: 'No users found.' });
+        }
 
-      // Map the users to the desired response format
-      const formattedUsers = users.map(user => ({
-          _id: user._id,
-          username: user.username,
-          email: user.email,
-          role: {
-              name: user.role.name // Get the role name
-          },
-          profileDetails: {
-              firstName: user.userProfile?.firstName || '',
-              lastName: user.userProfile?.lastName || '',
-              phoneNumber: user.userProfile?.phoneNumber || '',
-              address: user.userProfile?.address || '',
-              city: user.userProfile?.city || '',
-              province: user.userProfile?.province || '',
-              postalCode: user.userProfile?.postalCode || ''
-          }
-      }));
+        const formattedUsers = await Promise.all(users.map(async (user) => {
+            console.log('Processing user:', user);
 
-      return res.status(200).json(formattedUsers);
-  } catch (error) {
-      console.error('Error fetching users:', error ); // Log the error for debugging
-      return handleError(res, error, "An error occurred while fetching users");
-  }
+            const userProfile = await UserProfile.findOne({ user: user._id });
+            if (!userProfile) {
+                console.warn('User  profile not found for user:', user._id)
+                return {
+                    _id: user._id,
+                    username: user.username,
+                    email: user.email,
+                    role: {
+                        name: user.role ? user.role.name : 'No Role'
+                    },
+                    profileDetails: {
+                        firstName: '',
+                        lastName: '',
+                        phoneNumber: '',
+                        address: '',
+                        city: '',
+                        province: '',
+                        postalCode: ''
+                    }
+                };
+            }
+
+            return {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                role: {
+                    name: user.role ? user.role.name : 'No Role'
+                },
+                profileDetails: {
+                    firstName: userProfile.firstName || '',
+                    lastName: userProfile.lastName || '',
+                    phoneNumber: userProfile.phoneNumber || '',
+                    address: userProfile.address || '',
+                    city: userProfile.city || '',
+                    province: userProfile.province || '',
+                    postalCode: userProfile.postalCode || ''
+                }
+            };
+        }));
+
+        console.log('Formatted users data:', formattedUsers);
+        return res.status(200).json(formattedUsers);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        return handleError(res, error, "An error occurred while fetching users");
+    }
 };

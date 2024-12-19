@@ -11,9 +11,12 @@ const roleSchema = new mongoose.Schema({
         default: [],
     },
     permissions: {
-        type: [String], // or whatever type you need
+        type: [{ 
+            resource: { type: String, required: true }, 
+            action: { type: String, required: true } 
+        }], // Array of objects with resource and action
         default: [],
-    },
+        },
 });
 
 const Role = mongoose.model('Role', roleSchema);

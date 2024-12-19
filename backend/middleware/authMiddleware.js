@@ -3,6 +3,7 @@ const User = require('../models/User');
 
 const authMiddleware = async (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
+    console.log('Token received:', token);
     if (!token) {
         return res.status(401).json({ message: 'Access denied. Please provide token.' });
     }
@@ -17,6 +18,7 @@ const authMiddleware = async (req, res, next) => {
         }
 
         req.user = user; // Attach the user object to the request
+        console.log('Authenticated user:', req.user._id);
         // console.log('Authenticated user:', req.user); // Log the authenticated user
         next(); 
     } catch (error) {

@@ -36,3 +36,14 @@ exports.createRole = async (req, res) => {
     }
 };
 
+
+
+exports.getAllRoles = async (req, res) => {
+    try {
+        const roles = await Role.find();
+        return res.status(200).json(roles);
+    } catch (error) {
+        console.error('Error fetching roles:', error);
+        return res.status(500).json({ message: 'An error occurred while fetching roles' });
+    }
+};

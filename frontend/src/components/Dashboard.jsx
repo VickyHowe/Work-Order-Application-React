@@ -4,7 +4,7 @@ import { Button } from 'react-bootstrap';
 import axios from 'axios'; // Import Axios
 import AdminComponent from './AdminComponent'; // Import your admin component
 import ManagerComponent from './ManagerComponent'; // Import your manager component
-import UserComponent from './UserComponent'; // Import your user component
+import EmployeeComponent from './EmployeeComponent'; // Import your user component
 import CustomerComponent from './CustomerComponent';
 
 const Dashboard = ({ user, onLogout }) => {
@@ -55,7 +55,7 @@ const Dashboard = ({ user, onLogout }) => {
             case 'manager':
                 return <ManagerComponent />;
             case 'user':
-                return <UserComponent />;
+                return <EmployeeComponent />;
             case 'customer':
                 return <CustomerComponent />;
             default:

@@ -15,6 +15,8 @@ const permissionRoute = require('./routes/Permissions/permissionRoutes');
 const roleRoute = require('./routes/Roles/roleRoutes'); 
 const errorHandler = require('./middleware/errorHandler');
 const taskRoute = require('./routes/Tasks/taskRoutes'); 
+const pricelistRoute = require('./routes/Pricelist/priceListRoutes');
+
 /**
 * General Setup
 */
@@ -54,7 +56,9 @@ app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/permissions", permissionRoute); 
 app.use("/api/roles", roleRoute); 
-app.use("/api/tasks", taskRoute);
+app.use("/api", roleRoute); 
+app.use("/api/tasks", taskRoute); 
+app.use("/api/pricelist", pricelistRoute);
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
 

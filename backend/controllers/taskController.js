@@ -1,41 +1,61 @@
-const Task = require('../models/Task');
+const Task = require('../models/Task'); // Import the Task model
+const AppError = require('../utils/AppError');
 
-exports.getAllTasks = async (req, res) => {
+// Get all tasks
+exports.getAllTasks = async (req, res, next) => {
     try {
-        const tasks = await Task.find({ user: req.user.id }); // Fetch tasks for the authenticated user
+        const tasks = await Task.find().populate('user createdBy'); // Populate user and createdBy fields
         res.status(200).json(tasks);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching tasks' });
+        return next(new AppError('Error fetching tasks', 500));
     }
 };
 
-exports.createTask = async (req, res) => {
-    const { title, description } = req.body;
+// Create a new task
+exports.createTask = async (req, res, next) => {
     try {
-        const newTask = await Task.create({ title, description, user: req.user.id });
+        const { title, description, deadline, resources } = req.body;
+        const newTask = await Task.create({
+            title,
+            description,
+            deadline,
+            resources,
+            createdBy: req.user._id, // Set the creator to the authenticated user
+        });
         res.status(201).json(newTask);
     } catch (error) {
-        res.status(400).json({ message: 'Error creating task' });
+        return next(new AppError('Error creating task', 500));
     }
 };
 
-exports.updateTask = async (req, res) => {
-    const { id } = req.params;
-    const { title, description, status } = req.body;
+// Update a task
+exports.updateTask = async (req, res, next) => {
     try {
-        const updatedTask = await Task.findByIdAndUpdate(id, { title, description, status }, { new: true });
+        const { title, description, deadline, resources } = req.body;
+        const updatedTask = await Task.findByIdAndUpdate(req.params.id, {
+            title,
+            description,
+            deadline,
+            resources,
+        }, { new: true });
+        if (!updatedTask) {
+            return next(new AppError('Task not found', 404));
+        }
         res.status(200).json(updatedTask);
     } catch (error) {
-        res.status(400).json({ message: 'Error updating task' });
+        return next(new AppError('Error updating task', 500));
     }
 };
 
-exports.deleteTask = async (req, res) => {
-    const { id } = req.params;
+// Delete a task
+exports.deleteTask = async (req, res, next) => {
     try {
-        await Task.findByIdAndDelete(id);
-        res.status(204).send();
+        const deletedTask = await Task.findByIdAndDelete(req.params.id);
+        if (!deletedTask) {
+            return next(new AppError('Task not found', 404));
+        }
+        res.status(204).send(); // No content
     } catch (error) {
-        res.status(400).json({ message: 'Error deleting task' });
+        return next(new AppError('Error deleting task', 500));
     }
 };
