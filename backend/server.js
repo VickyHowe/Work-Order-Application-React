@@ -16,6 +16,7 @@ const roleRoute = require('./routes/Roles/roleRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const taskRoute = require('./routes/Tasks/taskRoutes'); 
 const pricelistRoute = require('./routes/Pricelist/priceListRoutes');
+const workOrderRoute = require('./routes/WorkOrders/workOrderRoutes');
 
 /**
 * General Setup
@@ -59,6 +60,8 @@ app.use("/api/roles", roleRoute);
 app.use("/api", roleRoute); 
 app.use("/api/tasks", taskRoute); 
 app.use("/api/pricelist", pricelistRoute);
+app.use("/api/workorders", workOrderRoute); 
+
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
 

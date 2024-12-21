@@ -16,7 +16,9 @@ const AdminComponent = () => {
             <Link to="/pricelist-management">
                 <button className="btn btn-secondary">Manage Pricelist</button>
             </Link>
-            {/* Other admin functionalities can go here */}
+            <Link to="/calendar">
+                <button className="btn btn-info">View Calendar</button>
+            </Link>
         </div>
     );
 };

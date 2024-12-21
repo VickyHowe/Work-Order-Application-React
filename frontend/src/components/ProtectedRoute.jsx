@@ -9,7 +9,10 @@ const ProtectedRoute = ({ element, user }) => {
         console.log('User  is not logged in, redirecting to login.');
         return <Navigate to="/login" />;
     }
-    // const userRole = user.role.name; // Assuming user.role.name gives the role name
+
+    // Uncomment and define allowedRoles if you want to implement role-based access
+    // const allowedRoles = ['admin', 'manager']; // Example roles
+    // const userRole = user.role; // Assuming user.role gives the role name
     // if (!allowedRoles.includes(userRole)) {
     //     return <Navigate to="/dashboard" />; // Redirect to dashboard if not allowed
     // }

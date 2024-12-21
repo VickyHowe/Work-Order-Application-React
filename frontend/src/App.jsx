@@ -7,12 +7,14 @@ import Dashboard from "./components/Dashboard";
 import RequestPasswordReset from "./components/RequestPasswordReset";
 import ResetPassword from "./components/ResetPassword";
 import "bootstrap/dist/css/bootstrap.min.css";
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UserManagement from "./components/UserManagement";
 import TaskList from "./components/Tasklist";
 import PricelistManagement from "./components/PricelistManagement";
 import Pricelist from "./components/Pricelist";
+import CalendarView from "./components/CalendarView";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -52,6 +54,13 @@ const App = () => {
                 user={user}
               />
             }
+          />
+          <Route 
+          path="/calendar" 
+          element={
+          <ProtectedRoute
+          element={<CalendarView />}
+          user={user} onLogout={handleLogout} />} 
           />
           <Route
             path="/task-list" // Add route for TaskList
