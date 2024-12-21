@@ -1,98 +1,66 @@
 require('dotenv').config({
-    path: './.env'
-  });
+  path: './.env'
+});
 const express = require("express");
 const cors = require('cors');
 const connectDB = require('./config/db');
 const path = require('path');
-const swaggerJsDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
-const User = require('./models/User'); 
-const Role = require('./models/Role'); 
-/**
- * Import Routes
- */
-const authRoutes = require('./routes/auth');
-const notificationsRoutes = require('./routes/notifications');
-const roleRoutes = require('./routes/role');
-const scheduleRoutes = require('./routes/schedule');
-const skillSetRoutes = require('./routes/skillSet');
-const userProfileRoutes = require('./routes/userProfile');
-const workOrderHistoryRoutes = require('./routes/workOrderHistory');
-
 
 /**
- * Swagger definition
- */
-const swaggerOptions = {
-  swaggerDefinition: {
-      openapi: '3.0.0',
-      info: {
-          title: 'WorkOrder API',
-          version: '1.0.0',
-          description: 'API documentation for work order application',
-          contact: {
-              name: 'Vicky Howe',
-              email: 'vickyhowe@oracana.ca',
-          },
-      },
-      servers: [
-          {
-              url: `http://localhost:${process.env.PORT || 5000}`,
-          },
-      ],
-      components: {
-          securitySchemes: {
-              bearerAuth: {
-                  type: 'http',
-                  scheme: 'bearer',
-                  bearerFormat: 'JWT',
-              },
-          },
-      },
-  },
-  apis: ['./routes/*.js'], 
-};
-
+* Import Routes
+*/
+const authRoute = require('./routes/Auth/authRoutes'); 
+const userRoute = require('./routes/User/userRoutes'); 
+const permissionRoute = require('./routes/Permissions/permissionRoutes'); 
+const roleRoute = require('./routes/Roles/roleRoutes'); 
+const errorHandler = require('./middleware/errorHandler');
+const taskRoute = require('./routes/Tasks/taskRoutes'); 
+const pricelistRoute = require('./routes/Pricelist/priceListRoutes');
 
 /**
- * General Setup
- */
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
+* General Setup
+*/
 const app = express();
 const port = process.env.PORT || 5000;
 
+/**
+* Middleware
+*/
+app.use(cors({
+  origin: 'http://localhost:5173', // Replace with your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+}));
+
 
 /**
- * Middleware
- */
+* Middleware
+*/
 app.use(cors());
 app.use(express.json());
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 /**
- * Connect to Database
- */
+* Connect to Database
+*/
 connectDB();
 
-
 /**
- * Connect Paths
- */
-
+* Connect Paths
+*/
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 /**
- * Routes
- */
-app.use('/api/auth', authRoutes);
-app.use('/api/notifications', notificationsRoutes);
-app.use('/api/roles', roleRoutes);
-app.use('/api/schedules', scheduleRoutes);
-app.use('/api/skillsets', skillSetRoutes);
-app.use('/api/userprofiles', userProfileRoutes);
-app.use('/api/workorderhistories', workOrderHistoryRoutes);
+* Routes
+*/
+app.use("/api/auth", authRoute); 
+app.use("/api/users", userRoute);
+app.use("/api/permissions", permissionRoute); 
+app.use("/api/roles", roleRoute); 
+app.use("/api", roleRoute); 
+app.use("/api/tasks", taskRoute); 
+app.use("/api/pricelist", pricelistRoute);
 
+app.listen(port, () => console.log(`Server running on port ${port}`));
 
-app.listen(port, () => console.log(`server running on port ${port}`));
+// Handling Error
+app.use(errorHandler);

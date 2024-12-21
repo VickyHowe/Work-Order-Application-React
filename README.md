@@ -46,6 +46,19 @@ Full stack Application using MERN stack framework.
     -	Using library such as Plotly.js or d3 charts to display current trends/statistics of completion, timeliness, cost.
 -	Customer Page
  
+## Frontend Setup
+- Step 1: Install Dependencies
+```
+npm install
+```
+- Step 2: Create a .env file in `frontend`
+Add the URL for the backend server
+```
+VITE_BACKEND_URL=http://localhost:5000
+```
+
+
+
 #### Backend
 -	Node.js 
 -	API 
@@ -58,6 +71,9 @@ Full stack Application using MERN stack framework.
 -	Database – MongoDB 
     -	To store API data
 
+    #### Error handling 
+ If an unhandledRejection error occurs, it logs out the error and closes the server with an exit code of 1.
+ 
 #### Models
 - Permission Model
     - Define individual permissions that can be granted
@@ -68,8 +84,6 @@ Full stack Application using MERN stack framework.
 - User Profile Model
     - Define user profiles and associates them with users
 
-### Hosting
-Render and MongoDB
 
 
 
@@ -113,3 +127,11 @@ username: 'admin'
 email: 'admin@example.com'
 password: 'admin123'
 These can be changed in `/scripts/setup.js`
+
+
+### Hosting
+Render and MongoDB
+
+
+### References 
+https://www.loginradius.com/blog/engineering/guest-post/nodejs-authentication-guide/

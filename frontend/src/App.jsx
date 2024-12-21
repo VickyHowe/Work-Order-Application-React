@@ -1,31 +1,86 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './components/Auth/AuthContext';
-import Dashboard from './components/Dashboard/Dashboard';
-import Schedule from './components/Schedule/Schedule';
-import Pricing from './components/Pricing/Pricing';
-import Tasks from './components/Tasks/Tasks';
-import Resources from './components/Resources/Resources';
-import Reports from './components/Reports/Reports';
-import Customers from './components/Customers/Customers';
-import Login from './components/Login/Login'; // Import the Login component
+import React, { useState } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Register from "./components/Register";
+import Login from "./components/Login";
+import UserProfile from "./components/UserProfile";
+import Dashboard from "./components/Dashboard";
+import RequestPasswordReset from "./components/RequestPasswordReset";
+import ResetPassword from "./components/ResetPassword";
+import "bootstrap/dist/css/bootstrap.min.css";
+import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
+import UserManagement from "./components/UserManagement";
+import TaskList from "./components/Tasklist";
+import PricelistManagement from "./components/PricelistManagement";
+import Pricelist from "./components/Pricelist";
 
 const App = () => {
+  const [user, setUser] = useState(null);
+
+  const handleLogout = () => {
+    setUser(null); // Clear user data on logout
+    localStorage.removeItem("token"); // Optionally clear token from local storage
+  };
+
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <div className="container mx-auto">
+        <Navbar user={user} onLogout={handleLogout} />
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/schedule" element={<Schedule />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/resources" element={<Resources />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/customers" element={<Customers />} />
-          <Route path="/login" element={<Login />} /> {/* Include the Login component */}
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login setUser={setUser} />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute
+                element={<UserProfile user={user} />}
+                user={user}
+              />
+            }
+          />
+          <Route
+            path="/request-password-reset"
+            element={<RequestPasswordReset />}
+            user={user}
+            allowedRoles={["employee", "manager", "admin"]}
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute
+                element={<Dashboard user={user} onLogout={handleLogout} />}
+                user={user}
+              />
+            }
+          />
+          <Route
+            path="/task-list" // Add route for TaskList
+            element={
+              <ProtectedRoute element={<TaskList user={user} />} user={user} />
+            }
+          />
+          <Route
+            path="/pricelist-management"
+            element={
+              <ProtectedRoute element={<PricelistManagement />} user={user} />
+            }
+          />
+          <Route
+            path="/pricelist"
+            element={
+              <ProtectedRoute element={<PricelistManagement />} user={user} />
+            }
+          />{" "}
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route
+            path="/user-management"
+            element={
+              <ProtectedRoute element={<UserManagement />} user={user} />
+            }
+          />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </div>
+    </Router>
   );
 };
 

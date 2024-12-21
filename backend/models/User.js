@@ -1,33 +1,33 @@
-const mongoose = require('mongoose');
-
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        validate: {
-            validator: function(v) {
-                return emailRegex.test(v);
-            },
-            message: props => `${props.value} is not a valid email!`
-        }
-    },
-    role: { 
-        type: String,
-        ref: 'Role',
-        required: true
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  securityQuestion: { type: String, required: true },
+  securityQuestionAnswer: { type: String, required: true },
+  role: { type: mongoose.Schema.Types.ObjectId, ref: "Role" },
+  userProfile: { type: mongoose.Schema.Types.ObjectId, ref: "User Profile" },
+}, {
+  toJSON: {
+    transform: function(doc, ret) {
+      // Remove sensitive fields
+      delete ret.password;
+      delete ret.securityQuestion;
+      delete ret.securityQuestionAnswer;
+      return ret;
     }
+  },
+  toObject: {
+    transform: function(doc, ret) {
+      // Remove sensitive fields
+      delete ret.password;
+      delete ret.securityQuestion;
+      delete ret.securityQuestionAnswer;
+      return ret;
+    }
+  }
 });
 
-module.exports = mongoose.model('User ', userSchema);
+const User = mongoose.model("User ", userSchema);
+module.exports = User;
