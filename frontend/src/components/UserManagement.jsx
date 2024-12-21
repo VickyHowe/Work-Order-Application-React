@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css"; // Ensure Bootstrap CSS is imported
-import { FaSortUp, FaSortDown } from "react-icons/fa"; // Import icons for sorting
+import { Modal, Button } from "react-bootstrap";
+import { FaSortUp, FaSortDown } from "react-icons/fa"; 
 import { useNavigate } from "react-router-dom";
 
 const UserManagement = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
-  const [roles, setRoles] = useState([]); // State to hold roles
+  const [roles, setRoles] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [roleChanges, setRoleChanges] = useState({}); // State to hold role changes
   const [selectedUser, setSelectedUser] = useState(null); // State to hold the selected user for details
@@ -243,7 +243,7 @@ const UserManagement = () => {
       </div>
 
       <div className="table-responsive">
-        <table className="table table-bordered table-hover">
+        <table className="table table-bordered table-hover ">
           <thead>
             <tr>
               <th
@@ -329,39 +329,39 @@ const UserManagement = () => {
                     )}
                 </td>
                 <td>
-                  <button
+                  <Button
                     onClick={() => handleViewDetails(user)}
                     className="btn btn-info"
                   >
                     View Details
-                  </button>
+                  </Button>
                   {currentUser._id !== user._id && ( // Check if the user is not the current user
                     <>
                       {currentUser.role?.name === "admin" && ( // Only show edit and delete buttons for admins
                         <>
-                          <button
+                          <Button
                             onClick={() => handleEditUser(user)}
                             className="btn btn-warning ml-2"
                           >
                             Edit
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => handleDeleteUser(user._id)}
                             className="btn btn-danger ml-2"
                           >
                             Delete
-                          </button>
+                          </Button>
                         </>
                       )}
                       {currentUser.role?.name === "manager" &&
                         user.role?.name !== "manager" &&
                         user.role?.name !== "admin" && ( // Managers can edit users who are not managers or admins
-                          <button
+                          <Button
                             onClick={() => handleEditUser(user)}
                             className="btn btn-warning ml-2"
                           >
                             Edit
-                          </button>
+                          </Button>
                         )}
                     </>
                   )}
@@ -371,269 +371,221 @@ const UserManagement = () => {
           </tbody>
         </table>
       </div>
-      <button onClick={handleSubmitChanges} className="btn btn-primary mt-4">
+      <Button onClick={handleSubmitChanges} className="btn btn-primary mt-4">
         Submit Changes
-      </button>
+      </Button>
 
       {/* Modal for viewing user details */}
-      {selectedUser && (
-        <div
-          className="modal fade show"
-          style={{ display: "block" }}
-          tabIndex="-1"
-          role="dialog"
-        >
-          <div className="modal-dialog" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">User Details</h5>
-                <button
-                  type="button"
-                  className="close"
-                  onClick={handleCloseDetails}
-                  aria-label="Close"
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                <p>
-                  <strong>Username:</strong> {selectedUser.username}
-                </p>
-                <p>
-                  <strong>Email:</strong> {selectedUser.email}
-                </p>
-                <p>
-                  <strong>Role:</strong> {selectedUser.role?.name || "No Role"}
-                </p>
-                <p>
-                  <strong>First Name:</strong>{" "}
-                  {selectedUser.profileDetails.firstName}
-                </p>
-                <p>
-                  <strong>Last Name:</strong>{" "}
-                  {selectedUser.profileDetails.lastName}
-                </p>
-                <p>
-                  <strong>Phone Number:</strong>{" "}
-                  {selectedUser.profileDetails.phoneNumber}
-                </p>
-                <p>
-                  <strong>Address:</strong>{" "}
-                  {selectedUser.profileDetails.address}
-                </p>
-                <p>
-                  <strong>City:</strong> {selectedUser.profileDetails.city}
-                </p>
-                <p>
-                  <strong>Province:</strong>{" "}
-                  {selectedUser.profileDetails.province}
-                </p>
-                <p>
-                  <strong>Postal Code:</strong>{" "}
-                  {selectedUser.profileDetails.postalCode}
-                </p>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={handleCloseDetails}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal show={!!selectedUser } onHide={handleCloseDetails}>
+        <Modal.Header closeButton>
+          <Modal.Title>User Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            <strong>Username:</strong> {selectedUser ?.username}
+          </p>
+          <p>
+            <strong>Email:</strong> {selectedUser ?.email}
+          </p>
+          <p>
+            <strong>Role:</strong> {selectedUser ?.role?.name || "No Role"}
+          </p>
+          <p>
+            <strong>First Name:</strong> {selectedUser ?.profileDetails.firstName}
+          </p>
+          <p>
+            <strong>Last Name:</strong> {selectedUser ?.profileDetails.lastName}
+          </p>
+          <p>
+            <strong>Phone Number:</strong> {selectedUser ?.profileDetails.phoneNumber}
+          </p>
+          <p>
+            <strong>Address:</strong> {selectedUser ?.profileDetails.address}
+          </p>
+          <p>
+            <strong>City:</strong> {selectedUser ?.profileDetails.city}
+          </p>
+          <p>
+            <strong>Province:</strong> {selectedUser ?.profileDetails.province}
+          </p>
+          <p>
+            <strong>Postal Code:</strong> {selectedUser  ?.profileDetails.postalCode}
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseDetails}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
-      {/* Modal for editing user details */}
-      {editUser && (
-        <div
-          className="modal fade show"
-          style={{ display: "block" }}
-          tabIndex="-1"
-          role="dialog"
-        >
-          <div className="modal-dialog" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Edit User Details</h5>
-                <button
-                  type="button"
-                  className="close"
-                  onClick={handleCloseEdit}
-                  aria-label="Close"
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <form onSubmit={handleEditSubmit}>
-                <div className="modal-body">
-                  <div className="form-group">
-                    <label>Username</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={editUser.username}
-                      onChange={(e) =>
-                        setEditUser({ ...editUser, username: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      value={editUser.email}
-                      onChange={(e) =>
-                        setEditUser({ ...editUser, email: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>First Name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={editUser.profileDetails.firstName}
-                      onChange={(e) =>
-                        setEditUser({
-                          ...editUser,
-                          profileDetails: {
-                            ...editUser.profileDetails,
-                            firstName: e.target.value,
-                          },
-                        })
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Last Name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={editUser.profileDetails.lastName}
-                      onChange={(e) =>
-                        setEditUser({
-                          ...editUser,
-                          profileDetails: {
-                            ...editUser.profileDetails,
-                            lastName: e.target.value,
-                          },
-                        })
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Phone Number</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={editUser.profileDetails.phoneNumber}
-                      onChange={(e) =>
-                        setEditUser({
-                          ...editUser,
-                          profileDetails: {
-                            ...editUser.profileDetails,
-                            phoneNumber: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Address</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={editUser.profileDetails.address}
-                      onChange={(e) =>
-                        setEditUser({
-                          ...editUser,
-                          profileDetails: {
-                            ...editUser.profileDetails,
-                            address: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>City</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={editUser.profileDetails.city}
-                      onChange={(e) =>
-                        setEditUser({
-                          ...editUser,
-                          profileDetails: {
-                            ...editUser.profileDetails,
-                            city: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Province</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={editUser.profileDetails.province}
-                      onChange={(e) =>
-                        setEditUser({
-                          ...editUser,
-                          profileDetails: {
-                            ...editUser.profileDetails,
-                            province: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Postal Code</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={editUser.profileDetails.postalCode}
-                      onChange={(e) =>
-                        setEditUser({
-                          ...editUser,
-                          profileDetails: {
-                            ...editUser.profileDetails,
-                            postalCode: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={handleCloseEdit}
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    Save Changes
-                  </button>
-                </div>
-              </form>
-            </div>
+ {/* Modal for editing user details */}
+<Modal show={!!editUser } onHide={handleCloseEdit}>
+  <Modal.Header closeButton>
+    <Modal.Title>Edit User Details</Modal.Title>
+  </Modal.Header>
+  <form onSubmit={handleEditSubmit}>
+    <Modal.Body>
+      {editUser  && ( // Check if editUser  is not null
+        <>
+          <div className="form-group">
+            <label>Username</label>
+            <input
+              type="text"
+              className="form-control"
+              value={editUser .username || ""}
+              onChange={(e) =>
+                setEditUser ({ ...editUser , username: e.target.value })
+              }
+              required
+            />
           </div>
-        </div>
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              className="form-control"
+              value={editUser .email || ""}
+              onChange={(e) =>
+                setEditUser ({ ...editUser , email: e.target.value })
+              }
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>First Name</label>
+            <input
+              type="text"
+              className="form-control"
+              value={editUser .profileDetails?.firstName || ""}
+              onChange={(e) =>
+                setEditUser ({
+                  ...editUser ,
+                  profileDetails: {
+                    ...editUser .profileDetails,
+                    firstName: e.target.value,
+                  },
+                })
+              }
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Last Name</label>
+            <input
+              type="text"
+              className="form-control"
+              value={editUser .profileDetails?.lastName || ""}
+              onChange={(e) =>
+                setEditUser ({
+                  ...editUser ,
+                  profileDetails: {
+                    ...editUser .profileDetails,
+                    lastName: e.target.value,
+                  },
+                })
+              }
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Phone Number</label>
+            <input
+              type="text"
+              className="form-control"
+              value={editUser .profileDetails?.phoneNumber || ""}
+              onChange={(e) =>
+                setEditUser ({
+                  ...editUser ,
+                  profileDetails: {
+                    ...editUser .profileDetails,
+                    phoneNumber: e.target.value,
+                  },
+                })
+              }
+            />
+          </div>
+          <div className="form-group">
+            <label>Address</label>
+            <input
+              type="text"
+              className="form-control"
+              value={editUser .profileDetails?.address || ""}
+              onChange={(e) =>
+                setEditUser ({
+                  ...editUser ,
+                  profileDetails: {
+                    ...editUser .profileDetails,
+                    address: e.target.value,
+                  },
+                })
+              }
+            />
+          </div>
+          <div className="form-group">
+            <label>City</label>
+            <input
+              type="text"
+              className="form-control"
+              value={editUser .profileDetails?.city || ""}
+              onChange={(e) =>
+                setEditUser ({
+                  ...editUser ,
+                  profileDetails: {
+                    ...editUser .profileDetails,
+                    city: e.target.value,
+                  },
+                })
+              }
+            />
+          </div>
+          <div className="form-group">
+            <label>Province</label>
+            <input
+              type="text"
+              className="form-control"
+              value={editUser .profileDetails?.province || ""}
+              onChange={(e) =>
+                setEditUser ({
+                  ...editUser ,
+                  profileDetails: {
+                    ...editUser .profileDetails,
+                    province: e.target.value,
+                  },
+                })
+              }
+            />
+          </div>
+          <div className="form-group">
+            <label>Postal Code</label>
+            <input
+              type="text"
+              className="form-control"
+              value={editUser .profileDetails?.postalCode || ""}
+              onChange={(e) =>
+                setEditUser ({
+                  ...editUser ,
+                  profileDetails: {
+                    ...editUser .profileDetails,
+                    postalCode: e.target.value,
+                  },
+                })
+              }
+            />
+          </div>
+        </>
       )}
+    </Modal.Body>
+    <Modal.Footer>
+      <Button variant="secondary" onClick={handleCloseEdit}>
+        Cancel
+      </Button>
+      <Button type="submit" variant="primary">
+        Save Changes
+      </Button>
+    </Modal.Footer>
+  </form>
+</Modal>
     </div>
   );
 };

@@ -11,9 +11,8 @@ import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UserManagement from "./components/UserManagement";
 import TaskList from "./components/Tasklist";
-import TaskManagement from "./components/TaskManagement";
 import PricelistManagement from "./components/PricelistManagement";
-import Pricelist from './components/Pricelist';
+import Pricelist from "./components/Pricelist";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -55,9 +54,9 @@ const App = () => {
             }
           />
           <Route
-            path="/task-management"
+            path="/task-list" // Add route for TaskList
             element={
-              <ProtectedRoute element={<TaskManagement />} user={user} />
+              <ProtectedRoute element={<TaskList user={user} />} user={user} />
             }
           />
           <Route
