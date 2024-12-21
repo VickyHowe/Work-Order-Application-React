@@ -57,8 +57,10 @@ exports.updateTask = async (req, res, next) => {
             description,
             deadline,
             resources,
-            user
-        }, { new: true });
+            user: user._id 
+        }, { new: true })
+        .select('-password -securityQuestion -securityQuestionAnswer')
+        .populate('user', 'username role _id');
 
         if (!updatedTask) {
             return next(new AppError('Task not found', 404));

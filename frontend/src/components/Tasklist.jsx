@@ -94,7 +94,7 @@ const TaskList = ({ user }) => {
             description: formData.description,
             deadline: formData.deadline,
             resources: formData.resources.split(",").map(item => item.trim()),
-            user: username // Set the user to the username instead of user ID
+            username: username // Set the user to the username instead of user ID
         };
 
         const response = await apiCall(`/api/tasks/${currentTaskId}`, 'put', updatedTask);
