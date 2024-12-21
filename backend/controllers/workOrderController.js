@@ -26,17 +26,25 @@ exports.createWorkOrderRequest = async (req, res) => {
 exports.updateWorkOrder = async (req, res) => {
     const { id } = req.params;
     const { status, internalComments, priority, reminders, predefinedServices, attachments } = req.body;
+
+    // Prepare the update object
+    const updateData = {
+        status,
+        priority,
+        reminders,
+        predefinedServices,
+        attachments,
+    };
+
+    // Only add internalComments to the update if it is an array
+    if (Array.isArray(internalComments)) {
+        updateData.$push = { internalComments: { $each: internalComments } };
+    }
+
     try {
-        const workOrder = await WorkOrder.findByIdAndUpdate(id, {
-            status,
-            priority,
-            reminders,
-            predefinedServices,
-            attachments,
-            $push: { internalComments: { $each: internalComments } },
-        }, { new: true });
+        const workOrder = await WorkOrder.findByIdAndUpdate(id, updateData, { new: true });
         if (!workOrder) return res.status(404).json({ message: 'Work order not found' });
-        res.status(200).json({message: 'WorkOrder edited sucessfully', workOrder});
+        res.status(200).json({ message: 'WorkOrder edited successfully', workOrder });
     } catch (error) {
         res.status(500).json({ message: 'Error updating work order', error: error.message });
     }
