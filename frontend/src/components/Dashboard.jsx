@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
@@ -18,10 +17,6 @@ const Dashboard = ({ onLogout }) => {
         onLogout();
         navigate('/login');
     };
-    // Define prop types for Dashboard
-Dashboard.propTypes = {
-    onLogout: PropTypes.func.isRequired, // Validate that onLogout is a function and is required
-};
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -32,6 +27,7 @@ Dashboard.propTypes = {
                     },
                 });
                 setUserData(response.data);
+                console.log(response);
             } catch (error) {
                 console.error('Error fetching user data:', error);
                 navigate('/login');

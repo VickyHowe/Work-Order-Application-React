@@ -45,7 +45,7 @@ exports.register = async (req, res, next) => {
             password: hashedPassword,
             securityQuestion,
             securityQuestionAnswer: hashedAnswer,
-            role: defaultRole._id, // Assign the default role
+            role: defaultRole._id, 
         });
 
         // Create a default user profile
@@ -60,7 +60,6 @@ exports.register = async (req, res, next) => {
             postalCode: 'a1a1a1' 
         });
 
-        // Save the user profile to the database
         await userProfile.save();
 
         return res.status(201).json({
@@ -75,29 +74,34 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
     const { username, password } = req.body;
 
-    // Check if username and password are provided
     if (!username || !password) {
         return next(new AppError("Username or Password not present", 400));
     }
 
     try {
-        const user = await User.findOne({ username }).populate('role');
+        const user = await User.findOne({ username })
+            .populate('userProfile')
+            .populate('role'); 
+
         if (!user) {
-            return next(new AppError("User not found", 401));
+            return next(new AppError("User  not found", 401));
         }
 
-        // Compare the provided password with the stored hashed password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return next(new AppError("Invalid password", 401));
         }
 
-        // Generate JWT token
         const token = generateToken(user);
 
         return res.status(200).json({
             message: "Login successful",
-            user: { id: user._id, role: user.role.name },
+            user: {
+                id: user._id,
+                username: user.username,
+                role: user.role.name, 
+                profilePicture: user.userProfile?.profilePicture || null 
+            },
             token,
         });
     } catch (error) {

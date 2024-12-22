@@ -23,6 +23,10 @@ router.get(
   roleCheck(["admin", "manager"], "view"),
   userController.getAllUsers
 );
+router.get("/users/:id", 
+  authMiddleware, 
+  userController.getUserById);
+
 router.put(
   "/:id/role",
   authMiddleware,

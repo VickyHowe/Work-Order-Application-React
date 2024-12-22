@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import defaultProfileImage from "/assets/img_default_profile.png";
 
 const UserProfile = ({ user }) => {
   const [profile, setProfile] = useState({
@@ -12,6 +12,7 @@ const UserProfile = ({ user }) => {
     city: "",
     province: "",
     postalCode: "",
+    profilePicture: "",
   });
 
   const [error, setError] = useState("");
@@ -20,7 +21,6 @@ const UserProfile = ({ user }) => {
   const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
 
-  
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -32,11 +32,9 @@ const UserProfile = ({ user }) => {
             },
           }
         );
-  
-        // Accessing profileDetails from the response
+
         const { profileDetails } = response.data;
-  
-        // Set the profile state with the fetched profile details
+
         setProfile({
           firstName: profileDetails.firstName || "",
           lastName: profileDetails.lastName || "",
@@ -45,14 +43,16 @@ const UserProfile = ({ user }) => {
           city: profileDetails.city || "",
           province: profileDetails.province || "",
           postalCode: profileDetails.postalCode || "",
+          profilePicture: profileDetails.profilePicture || "",
         });
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch profile");
+        console.error("Error fetching profile:", err);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchProfile();
   }, []);
 
@@ -96,7 +96,10 @@ const UserProfile = ({ user }) => {
     try {
       const response = await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/api/users/profile`,
-        profile,
+        {
+          ...profile,
+          profilePicture: profile.profilePicture,
+        },
         {
           headers: {
             "Content-Type": "application/json",
@@ -125,7 +128,6 @@ const UserProfile = ({ user }) => {
 
   const handleCancel = () => {
     setIsEditing(false);
-    // Optionally reset the form fields to the original values fetched from the API
     setProfile({
       firstName: "",
       lastName: "",
@@ -134,138 +136,196 @@ const UserProfile = ({ user }) => {
       city: "",
       province: "",
       postalCode: "",
+      profilePicture: "",
     });
+  };
+
+  const handleResetPassword = () => {
+    navigate("/request-password-reset");
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size exceeds 5MB limit.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfile({ ...profile, profilePicture: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   if (loading) return <p>Loading...</p>;
 
   return (
     <div className="max-w-md mx-auto mt-10">
-      <h2 className="text-2xl mb-4">User  Profile</h2>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      {Object.keys(validationErrors).map((key) => (
-        <p key={key} className="text-red-500 mb-4">
-          {validationErrors[key]}
-        </p>
-      ))}
-      {isEditing ? (
-        <form onSubmit={handleUpdate}>
-          <input
-            type="text"
-            placeholder="First Name"
-            value={profile.firstName || ""}
-            onChange={(e) =>
-              setProfile({ ...profile, firstName: e.target.value })
-            }
-            className="border p-2 mb-4 w-full"
-            aria-label="First Name"
-          />
-          <input
-            type="text"
-            placeholder="Last Name"
-            value={profile.lastName || ""}
-            onChange={(e) =>
-              setProfile({ ...profile, lastName: e.target.value })
-            }
-            className="border p-2 mb-4 w-full"
-            aria-label="Last Name"
-          />
-          <input
-            type="text"
-            placeholder="Phone Number"
-            value={profile.phoneNumber || ""}
-            onChange={(e) =>
-              setProfile({ ...profile, phoneNumber: e.target.value })
-            }
-            className="border p-2 mb-4 w-full"
-            aria-label="Phone Number"
-          />
-          <input
-            type="text"
-            placeholder="Address"
-            value={profile.address || ""}
-            onChange={(e) =>
-              setProfile({ ...profile, address: e.target.value })
-            }
-            className="border p-2 mb-4 w-full"
-            aria-label="Address"
-          />
-          <input
-            type="text"
-            placeholder="City"
-            value={profile.city || ""}
-            onChange={(e) => setProfile({ ...profile, city: e.target.value })}
-            className="border p-2 mb-4 w-full"
-            aria-label="City"
-          />
-          <input
-            type="text"
-            placeholder="Province"
-            value={profile.province || ""}
-            onChange={(e) =>
-              setProfile({ ...profile, province: e.target.value })
-            }
-            className="border p-2 mb-4 w-full"
-            aria-label="Province"
-          />
-          <input
-            type="text"
-            placeholder="Postal Code"
-            value={profile.postalCode || ""}
-            onChange={(e) =>
-              setProfile({ ...profile, postalCode: e.target.value })
-            }
-            className="border p-2 mb-4 w-full"
-            aria-label="Postal Code"
-          />
-          <button type="submit" className="bg-blue-500 text-white p-2">
-            Update Profile
-          </button>
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="bg-red-500 text-white p-2 ml-4"
-          >
-            Cancel
-          </button>
-        </form>
-      ) : (
-        <div>
-          <p>
-  <strong>User:</strong> {user.username} {/* Added this line to display the user's username */}
-</p>
-          <p>
-            <strong>First Name:</strong> {profile.firstName}
+      <form
+        onSubmit={handleUpdate}
+        className="mb-4 bg-gray-400 border-gray p-6 rounded-lg shadow-md"
+      >
+        <h2 className="text-2xl mb-4">User Profile</h2>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {Object.keys(validationErrors).map((key) => (
+          <p key={key} className="text-red-500 mb-4">
+            {validationErrors[key]}
           </p>
-          <p>
-            <strong>Last Name:</strong> {profile.lastName}
-          </p>
-          <p>
-            <strong>Phone Number:</strong> {profile.phoneNumber}
-          </p>
-          <p>
-            <strong>Address:</strong> {profile.address}
-          </p>
-          <p>
-            <strong>City:</strong> {profile.city}
-          </p>
-          <p>
-            <strong>Province:</strong> {profile.province}
-          </p>
-          <p>
-            <strong>Postal Code:</strong> {profile.postalCode}
-          </p>
-          <button
-            onClick={() => setIsEditing(true)}
-            className="bg-yellow-500 text-white p-2 mt-4"
-          >
-            Edit Profile
-          </button>
-        </div>
-      )}
+        ))}
+        {isEditing ? (
+          <>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="mb-4"
+            />
+            <div className="p-2 mb-4">
+              {" "}
+              <img
+                src={profile.profilePicture || defaultProfileImage}
+                alt="Profile"
+                className="w-32 h-32 rounded-full"
+              />
+            </div>
+            <input
+              type="text"
+              placeholder="First Name"
+              value={profile.firstName || ""}
+              onChange={(e) =>
+                setProfile({ ...profile, firstName: e.target.value })
+              }
+              className="border p-2 mb-4 w-full rounded-md placeholder-gray-400"
+              aria-label="First Name"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={profile.lastName || ""}
+              onChange={(e) =>
+                setProfile({ ...profile, lastName: e.target.value })
+              }
+              className="border p-2 mb-4 w-full rounded-md placeholder-gray-400"
+              aria-label="Last Name"
+            />
+            <input
+              type="text"
+              placeholder="Phone Number"
+              value={profile.phoneNumber || ""}
+              onChange={(e) =>
+                setProfile({ ...profile, phoneNumber: e.target.value })
+              }
+              className="border p-2 mb-4 w-full rounded-md placeholder-gray-400"
+              aria-label="Phone Number"
+            />
+            <input
+              type="text"
+              placeholder="Address"
+              value={profile.address || ""}
+              onChange={(e) =>
+                setProfile({ ...profile, address: e.target.value })
+              }
+              className="border p-2 mb-4 w-full rounded-md placeholder-gray-400"
+              aria-label="Address"
+            />
+            <input
+              type="text"
+              placeholder="City"
+              value={profile.city || ""}
+              onChange={(e) => setProfile({ ...profile, city: e.target.value })}
+              className="border p-2 mb-4 w-full rounded-md placeholder-gray-400"
+              aria-label="City"
+            />
+            <input
+              type="text"
+              placeholder="Province"
+              value={profile.province || ""}
+              onChange={(e) =>
+                setProfile({ ...profile, province: e.target.value })
+              }
+              className="border p-2 mb-4 w-full rounded-md placeholder-gray-400"
+              aria-label="Province"
+            />
+            <input
+              type="text"
+              placeholder="Postal Code"
+              value={profile.postalCode || ""}
+              onChange={(e) =>
+                setProfile({ ...profile, postalCode: e.target.value })
+              }
+              className="border p-2 mb-4 w-full rounded-md placeholder-gray-400"
+              aria-label="Postal Code"
+            />
+            <div className="flex justify-between">
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="p-2 mb-4">
+              {" "}
+              <img
+                src={profile.profilePicture || defaultProfileImage}
+                alt="Profile"
+                className="w-32 h-32 rounded-full"
+              />
+            </div>
+            <p className="mb-4">
+              <strong>First Name:</strong> {profile.firstName || "N/A"}
+            </p>
+            <p className="mb-4">
+              <strong>Last Name:</strong> {profile.lastName || "N/A"}
+            </p>
+            <p className="mb-4">
+              <strong>Phone Number:</strong> {profile.phoneNumber || "N/A"}
+            </p>
+            <p className="mb-4">
+              <strong>Address:</strong> {profile.address || "N/A"}
+            </p>
+            <p className="mb-4">
+              <strong>City:</strong> {profile.city || "N/A"}
+            </p>
+            <p className="mb-4">
+              <strong>Province:</strong> {profile.province || "N/A"}
+            </p>
+            <p className="mb-4">
+              <strong>Postal Code:</strong> {profile.postalCode || "N/A"}
+            </p>
+            <div className="flex justify-between">
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={handleResetPassword}
+                className="bg-purple-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+              >
+                Reset Password
+              </button>
+            </div>
+          </>
+        )}
+      </form>
     </div>
   );
-
 };
 
 export default UserProfile;

@@ -2,83 +2,85 @@ require('dotenv').config({ path: '../.env' });
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const Role = require('../models/Role');
-const UserProfile = require('../models/UserProfile'); // Import UserProfile model
+const UserProfile = require('../models/UserProfile');
 const bcrypt = require('bcryptjs');
-const connectDB = require('../config/db'); 
+const connectDB = require('../config/db');
 
-const adminUser    = {
-    username: 'admin',
-    email: 'admin@example.com',
-    password: 'admin123',
-    securityQuestion: "What is your mother's maiden name?",
-    securityQuestionAnswer: "Smith",
-    role: 'admin' // Directly assign the role name
-};
-
-const managerUser   = {
-    username: 'manager',
-    email: 'manager@example.com',
-    password: 'manager123',
-    securityQuestion: "What is your favorite color?",
-    securityQuestionAnswer: "Blue",
-    role: 'manager' // Directly assign the role name
-};
-
-const employeeUser   = {
-    username: 'employee',
-    email: 'employee@example.com',
-    password: 'employee123',
-    securityQuestion: "What is your pet's name?",
-    securityQuestionAnswer: "Buddy",
-    role: 'employee' // Directly assign the role name
-};
-
-const customerUser   = {
-    username: 'customer',
-    email: 'customer@example.com',
-    password: 'customer123',
-    securityQuestion: "What is your mother's maiden name?",
-    securityQuestionAnswer: "Johnson",
-    role: 'customer' // Directly assign the role name
-};
-
+// Define roles
 const roles = [
-    { 
-        name: 'admin', 
-        canAssign: ['*'], 
+    {
+        name: 'admin',
+        canAssign: ['*'],
         permissions: [
             { resource: '*', action: '*' }
-        ] 
+        ]
     },
-    { 
-        name: 'manager', 
-        canAssign: ['employee', 'customer'], // Managers can assign roles to employees and customers
+    {
+        name: 'manager',
+        canAssign: ['employee', 'customer'],
         permissions: [
             { resource: 'tasks', action: 'manage' },
             { resource: 'roles', action: 'view' },
-            { resource: 'roles', action: 'assign' }, // Allow managers to assign roles
-            { resource: 'profile', action: 'view' }, // Allow managers to view profiles
-            { resource: 'profile', action: 'update' } // Allow managers to update profiles
-        ] 
+            { resource: 'roles', action: 'assign' },
+            { resource: 'profile', action: 'view' },
+            { resource: 'profile', action: 'update' }
+        ]
     },
-    { 
-        name: 'employee', 
-        canAssign: [], 
+    {
+        name: 'employee',
+        canAssign: [],
         permissions: [
             { resource: 'tasks', action: 'view' },
             { resource: 'profile', action: 'update' }
-        ] 
+        ]
     },
-    { 
-        name: 'customer', 
-        canAssign: [], 
+    {
+        name: 'customer',
+        canAssign: [],
         permissions: [
             { resource: 'pricelists', action: 'view' },
             { resource: 'profile', action: 'update' }
-        ] 
+        ]
     },
 ];
 
+// Define users
+const users = [
+    {
+        username: 'admin',
+        email: 'admin@example.com',
+        password: 'admin123',
+        securityQuestion: "What is your mother's maiden name?",
+        securityQuestionAnswer: "Smith",
+        role: 'admin' // This should match the role name in the roles collection
+    },
+    {
+        username: 'manager',
+        email: 'manager@example.com',
+        password: 'manager123',
+        securityQuestion: "What is your favorite color?",
+        securityQuestionAnswer: "Blue",
+        role: 'manager'
+    },
+    {
+        username: 'employee',
+        email: 'employee@example.com',
+        password: 'employee123',
+        securityQuestion: "What is your pet's name?",
+        securityQuestionAnswer: "Buddy",
+        role: 'employee'
+    },
+    {
+        username: 'customer',
+        email: 'customer@example.com',
+        password: 'customer123',
+        securityQuestion: "What is your mother's maiden name?",
+        securityQuestionAnswer: "Johnson",
+        role: 'customer'
+    }
+];
+
+// Function to seed roles
 const seedRoles = async () => {
     for (const roleData of roles) {
         const existingRole = await Role.findOne({ name: roleData.name });
@@ -93,11 +95,11 @@ const seedRoles = async () => {
     }
 };
 
+// Function to seed users
 const seedUsers = async () => {
-    const users = [adminUser , managerUser , employeeUser , customerUser ];
     for (const userData of users) {
-        const existingUser  = await User.findOne({ username: userData.username });
-        if (existingUser ) {
+        const existingUser    = await User .findOne({ username: userData.username });
+        if (existingUser   ) {
             console.log(`${userData.username} already exists.`);
             continue;
         }
@@ -107,12 +109,12 @@ const seedUsers = async () => {
 
         // Find the role by name
         const role = await Role.findOne({ name: userData.role });
-        if (!role ) {
+        if (!role) {
             console.error(`Role '${userData.role}' not found for user ${userData.username}. Please ensure roles are seeded before users.`);
             continue; // Skip this user if the role does not exist
         }
 
-        const newUser   = new User({
+        const newUser    = new User ({
             username: userData.username,
             email: userData.email,
             password: hashedPassword,
@@ -121,51 +123,48 @@ const seedUsers = async () => {
             role: role._id,
         });
 
-        await newUser .save();
-        console.log(`${userData.username} created successfully.`);
+        // Save the user
+        await newUser  .save();
+        console.log(`User   '${userData.username}' created successfully.`);
 
-        // Create a default user profile for each user
-        const defaultProfile = new UserProfile({
-            user: newUser ._id,
-            firstName: userData.username.charAt(0).toUpperCase() + userData.username.slice(1), // Capitalize first letter
-            lastName: 'User  ',
-            phoneNumber: '1234567890',
-            address: '',
-            city: '',
-            province: '',
-            postalCode: 'a1a1a1'
+        // Create a user profile
+        const userProfile = new UserProfile({
+            user: newUser  ._id,
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'john.doe@example.com',
+            phone: '123-456-7890',
+            address: '123 Main St',
+            city: 'Anytown',
+            state: 'Anystate',
+ postalCode: 't1t1t1',
+            country: 'USA',
+            avatar: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUTExMVFRUXGBcZGBgXFRcVFRUVFxUYFxYVFRUYHSggGBolGxcVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OGxAQGy0lHyUtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAKgBLAMBIgACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAACAwABBAUGB//EADwQAAEDAgQDBgYHBwUAAAAEAAhEDIRIQVFhEyIyQlJxgTKSFBUQktHwMzUqGx0QgTlJT8FJSYnL/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8A+4f/Z',
         });
 
-        await defaultProfile.save();
-        console.log(`Default profile created for ${userData.username}.`);
+        // Save the user profile
+        await userProfile.save();
+        console.log(`User  profile for '${userData.username}' created successfully.`);
+
+        // Update the user document with the user profile ID
+        newUser .userProfile = userProfile._id;
+        await newUser .save();
+        console.log(`User  '${userData.username}' updated with user profile ID.`);
     }
 };
 
-const seedAdminUser  = async () => {
+// Connect to the database
+connectDB();
+
+// Seed roles and users
+(async () => {
     try {
-        // Connect to the database
-        await connectDB(); 
-
-        // Seed roles first
         await seedRoles();
-
-        // Seed users
         await seedUsers();
-
+        console.log('Seeding completed successfully.');
+        process.exit(0);
     } catch (error) {
-        console.error('Error seeding users:', error);
-    } finally {
-        // Close the database connection
-        mongoose.connection.close();
+        console.error('Error during seeding:', error);
+        process.exit(1);
     }
-};
-
-connectDB()
-    .then(() => {
-        console.log('MongoDB connected successfully');
-        // Run the seed function
-        seedAdminUser ();
-    })
-    .catch(err => {
-        console.error('MongoDB connection error:', err);
-    });
+})();

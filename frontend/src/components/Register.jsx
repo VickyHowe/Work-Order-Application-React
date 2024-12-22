@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -60,51 +61,76 @@ const Register = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-10">
+        <div className="max-w-md mx-auto mt-10">
+        <form onSubmit={handleSubmit} className="mb-4 bg-gray-400 border-gray p-6 rounded-lg shadow-md">
             <h2 className="text-2xl mb-4">Register</h2>
             {error && <p className="text-red-500 mb-4">{error}</p>}
+            <div className="mb-4">
+            <label htmlFor="username" className="block mb-1">Username</label>
             <input
                 type="text"
                 placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="border p-2 mb-4 w-full"
+                className="border p-2 mb-4 w-full rounded-md"
                 required
             />
-            <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="border p-2 mb-4 w-full"
-                required
-            />
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="border p-2 mb-4 w-full"
-                required
-            />
-            <input
-                type="text"
-                placeholder="Security Question (e.g., What is your mother's maiden name?)"
-                value={securityQuestion}
-                onChange={(e) => setSecurityQuestion(e.target.value)}
-                className="border p-2 mb-4 w-full"
-                required
-            />
-            <input
-                type="text"
-                placeholder="Security Question Answer"
-                value={securityQuestionAnswer}
-                onChange={(e) => setSecurityQuestionAnswer(e.target.value)}
-                className="border p-2 mb-4 w-full"
-                required
-            />
-            <button type="submit" className="bg-blue-500 text-white p-2 w-full">Register</button>
+            </div>
+            <div className="mb-4">
+                    <label htmlFor="email" className="block mb-1">Email</label>
+                    <input
+                        id="email"
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="border p-2 w-full rounded-md placeholder-gray-400" // Added rounded and placeholder color
+                        required
+                    />
+                </div>
+                <div className="mb-4">
+                    <label htmlFor="password" className="block mb-1">Password</label>
+                    <input
+                        id="password"
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="border p-2 w-full rounded-md placeholder-gray-400" // Added rounded and placeholder color
+                        required
+                    />
+                </div>
+                <div className="mb-4">
+                    <label htmlFor="securityQuestion" className="block mb-1">Security Question</label>
+                    <input
+                        id="securityQuestion"
+                        type="text"
+                        placeholder="Security Question (e.g., What is your mother's maiden name?)"
+                        value={securityQuestion}
+                        onChange={(e) => setSecurityQuestion(e.target.value)}
+                        className="border p-2 w-full rounded-md placeholder-gray-400" // Added rounded and placeholder color
+                        required
+                    />
+                </div>
+                <div className="mb-4">
+                    <label htmlFor="securityQuestionAnswer" className="block mb- 1">Security Question Answer</label>
+                    <input
+                        id="securityQuestionAnswer"
+                        type="text"
+                        placeholder="Security Question Answer"
+                        value={securityQuestionAnswer}
+                        onChange={(e) => setSecurityQuestionAnswer(e.target.value)}
+                        className="border p-2 w-full rounded-md placeholder-gray-400" // Added rounded and placeholder color
+                        required
+                    />
+                </div>
+            <button type="submit" className="bg-blue-500 text-white p-2 w-full rounded-md">Register</button>
+            <p className="text-center">
+                Already have an account?{" "}
+                <Link to="/login" className="text-blue-500 hover:underline">Login here</Link>
+            </p>
         </form>
+        </div>
     );
 };
 

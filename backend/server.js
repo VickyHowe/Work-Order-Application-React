@@ -58,6 +58,7 @@ app.use("/api/users", userRoute);
 app.use("/api/permissions", permissionRoute); 
 app.use("/api/roles", roleRoute); 
 app.use("/api", roleRoute); 
+app.use("/api", userRoute); 
 app.use("/api/tasks", taskRoute); 
 app.use("/api/pricelist", pricelistRoute);
 app.use("/api/workorders", workOrderRoute); 

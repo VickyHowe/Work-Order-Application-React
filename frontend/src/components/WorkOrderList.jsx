@@ -300,7 +300,7 @@ const WorkOrderList = ({ user, selectedOrder, setSelectedOrder }) => {
                 </tr>
               ))}
             </thead>
-            <tbody {...getTableBodyProps()}>
+<tbody {...getTableBodyProps()}>
   {page.map((row) => {
     prepareRow(row);
     const rowProps = row.getRowProps();

@@ -1,14 +1,12 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import PropTypes from "prop-types";
 
-const Login = ({ setUser  }) => {
+const Login = ({ setUser }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -29,7 +27,7 @@ const Login = ({ setUser  }) => {
       const data = await response.json();
 
       if (response.ok && data.token) {
-        setUser ({
+        setUser({
           id: data.user.id,
           username,
           role: data.user.role,
@@ -40,20 +38,22 @@ const Login = ({ setUser  }) => {
           JSON.stringify({
             id: data.user.id,
             username: data.user.username,
-            role: data.user.role,
+            role: data.user.role.name,
           })
         );
         navigate("/Dashboard");
       } else {
         // Handle errors
-        const errorMessage = data.message || data.error || "Login failed. Please try again.";
-        setError(errorMessage);
-        console.error("Login error:", errorMessage); // Log the error to the console
+        if (data.message) {
+          setError(data.message);
+        } else if (data.error) {
+          setError(data.error);
+        } else {
+          setError("Login failed. Please try again.");
+        }
       }
     } catch (error) {
-      const errorMessage = "An error occurred. Please try again later.";
-      setError(errorMessage);
-      console.error("Fetch error:", errorMessage); // Log the error to the console
+      setError("An error occurred. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -111,17 +111,13 @@ const Login = ({ setUser  }) => {
         </Link>
       </p>
       <p className="text-center mt-4">
-        Don&apos;t have an account?{" "}
+        Don't have an account?{" "}
         <Link to="/register" className="text-blue-500 hover:underline">
           Register here
         </Link>
       </p>
     </div>
   );
-};
-// Define prop types for Login
-Login.propTypes = {
-  setUser: PropTypes.func.isRequired, // Validate that setUser  is a function and is required
 };
 
 export default Login;
