@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Link } from 'react-router-dom';
 
 const CustomerComponent = () => {
@@ -9,7 +9,9 @@ const CustomerComponent = () => {
             <Link to="/pricelist">
                 <button className="btn btn-primary">View Services</button>
             </Link>
-            {/* Add more customer-specific functionality here */}
+            <Link to="/calendar">
+                <button className="btn btn-info">View Calendar</button>
+            </Link>
         </div>
     );
 };

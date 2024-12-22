@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import PricelistManagement from './PricelistManagement';
 import TaskList from './Tasklist';
@@ -13,7 +12,9 @@ const ManagerComponent = () => {
             <Link to="/user-management">
                 <button className="btn btn-primary">Manage Users</button>
             </Link>
-            {/* Add more manager-specific functionality here */}
+            <Link to="/calendar">
+                <button className="btn btn-info">View Calendar</button>
+            </Link>
         </div>
     );
 };

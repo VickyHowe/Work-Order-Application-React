@@ -1,5 +1,5 @@
-import React from 'react';
 import TaskList from './Tasklist';
+import { Link } from 'react-router-dom';
 
 const EmployeeComponent = () => {
     return (
@@ -7,7 +7,9 @@ const EmployeeComponent = () => {
             <h3>User Dashboard</h3>
             <p>Here you can view your profile and settings.</p>
             <TaskList user={{ role: { name: 'employee' } }} />
-            {/* Add more user-specific functionality here */}
+            <Link to="/calendar">
+                <button className="btn btn-info">View Calendar</button>
+            </Link>
         </div>
     );
 };
