@@ -1,6 +1,6 @@
-import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar, Nav, Button } from "react-bootstrap";
+import PropTypes from "prop-types"; 
 
 const CustomNavbar = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -50,6 +50,12 @@ const CustomNavbar = ({ user, onLogout }) => {
       </div>
     </Navbar>
   );
+};
+
+// Define prop types for CustomNavbar
+CustomNavbar.propTypes = {
+  user: PropTypes.object, // Define user as an object (or specify a more specific shape if needed)
+  onLogout: PropTypes.func.isRequired, // Define onLogout as a required function
 };
 
 export default CustomNavbar;

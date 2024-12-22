@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 
 const PricelistManagement = () => {
@@ -10,7 +10,8 @@ const PricelistManagement = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/pricelist`, {
+            // Removed the unused response variable
+            await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/pricelist`, {
                 itemName,
                 price,
                 description,
@@ -20,8 +21,12 @@ const PricelistManagement = () => {
                 },
             });
             // Handle success (e.g., show a success message or reset form)
-        } catch (err) {
-            setError('Error creating pricelist item');
+            // Optionally reset the form fields after successful submission
+            setItemName('');
+            setPrice('');
+            setDescription('');
+        } catch {
+            setError('Error creating pricelist item'); // Removed the unused err variable
         }
     };
 

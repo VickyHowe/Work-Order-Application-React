@@ -1,5 +1,5 @@
-import React from 'react';
 import { Navigate } from 'react-router-dom';
+import PropTypes from 'prop-types'; // Import PropTypes
 
 const ProtectedRoute = ({ element, user }) => {
     console.log('ProtectedRoute rendered with user:', user);
@@ -19,6 +19,12 @@ const ProtectedRoute = ({ element, user }) => {
 
     console.log('User  is authorized, rendering the protected component.');
     return element; // Render the protected component
+};
+
+// Define prop types for ProtectedRoute
+ProtectedRoute.propTypes = {
+    element: PropTypes.element.isRequired, // Define element as a required React element
+    user: PropTypes.object, // Define user as an object (or specify a more specific shape if needed)
 };
 
 export default ProtectedRoute;

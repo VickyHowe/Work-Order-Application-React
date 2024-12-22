@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import axios from 'axios';
@@ -17,6 +18,10 @@ const Dashboard = ({ onLogout }) => {
         onLogout();
         navigate('/login');
     };
+    // Define prop types for Dashboard
+Dashboard.propTypes = {
+    onLogout: PropTypes.func.isRequired, // Validate that onLogout is a function and is required
+};
 
     useEffect(() => {
         const fetchUserData = async () => {

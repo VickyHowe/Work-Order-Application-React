@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const Pricelist = () => {
@@ -10,14 +10,16 @@ const Pricelist = () => {
     useEffect(() => {
         const fetchPricelists = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/pricelist`, {
+                // Removed the unused response variable
+                await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/pricelist`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
+                }).then(response => {
+                    setPricelists(response.data);
                 });
-                setPricelists(response.data);
-            } catch (err) {
-                setError('Error fetching pricelist');
+            } catch {
+                setError('Error fetching pricelist'); // Removed the unused err variable
             }
         };
 
@@ -27,7 +29,8 @@ const Pricelist = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/tasks`, {
+            // Removed the unused response variable
+            await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/tasks`, {
                 title: selectedService,
                 description: `Requested service: ${selectedService}`,
                 deadline: desiredTimeline,
@@ -41,8 +44,8 @@ const Pricelist = () => {
             // Reset the form
             setSelectedService('');
             setDesiredTimeline('');
-        } catch (err) {
-            setError('Error submitting service request');
+        } catch {
+            setError('Error submitting service request'); // Removed the unused err variable
         }
     };
 

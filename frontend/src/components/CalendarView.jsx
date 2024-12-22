@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
-import axios from 'axios';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import WorkOrderList from './WorkOrderList'; // Import the WorkOrderList component
 import useFetchWorkOrders from './useFetchWorkOrders'; // Import the custom hook
+import PropTypes from 'prop-types';
 
 const localizer = momentLocalizer(moment);
 
 const CalendarView = ({ user }) => {
     const token = localStorage.getItem('token');
-    const { workOrders, loading, error, fetchWorkOrders } = useFetchWorkOrders(token);
+    const { workOrders, fetchWorkOrders } = useFetchWorkOrders(token);
     const [showWorkOrderList, setShowWorkOrderList] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
 
+    CalendarView.propTypes = {
+        user: PropTypes.object.isRequired, // Validate that user is an object and is required
+    };
     // Create events from workOrders
     const events = workOrders.map(order => ({
         _id: order._id,

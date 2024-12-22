@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+
 
 const UserProfile = ({ user }) => {
   const [profile, setProfile] = useState({
@@ -19,6 +20,7 @@ const UserProfile = ({ user }) => {
   const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
 
+  
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -230,6 +232,9 @@ const UserProfile = ({ user }) => {
       ) : (
         <div>
           <p>
+  <strong>User:</strong> {user.username} {/* Added this line to display the user's username */}
+</p>
+          <p>
             <strong>First Name:</strong> {profile.firstName}
           </p>
           <p>
@@ -260,6 +265,7 @@ const UserProfile = ({ user }) => {
       )}
     </div>
   );
+
 };
 
 export default UserProfile;

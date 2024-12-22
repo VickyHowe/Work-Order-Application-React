@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Modal, Button } from "react-bootstrap";
 
@@ -71,7 +71,7 @@ const TaskList = ({ user }) => {
       setTasks([...tasks, response]);
       setFormData({ title: "", description: "", deadline: "", resources: "", assignedUserId: "" });
       setShowModal(false);
-    } catch (err) {
+    } catch {
       setError("Error creating task");
     }
   };
@@ -101,7 +101,7 @@ const TaskList = ({ user }) => {
         setTasks(tasks.map(task => (task._id === currentTaskId ? response : task)));
         setFormData({ title: "", description: "", deadline: "", resources: "", assignedUserId: "" }); // Reset form data
         setShowEditModal(false);
-    } catch (err) {
+    } catch {
         setError("Error updating task");
     }
 };
@@ -325,6 +325,7 @@ const TaskList = ({ user }) => {
       </Modal>
     </div>
   );
+
 };
 
 export default TaskList;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Register from "./components/Register";
 import Login from "./components/Login";
@@ -13,12 +13,12 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import UserManagement from "./components/UserManagement";
 import TaskList from "./components/Tasklist";
 import PricelistManagement from "./components/PricelistManagement";
-import Pricelist from "./components/Pricelist";
 import CalendarView from "./components/CalendarView";
 import WorkOrderList from "./components/WorkOrderList";
 
+
 const App = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser ] = useState(null);
 
   const handleLogout = () => {
     setUser(null); // Clear user data on logout
