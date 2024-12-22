@@ -62,7 +62,7 @@ const Register = () => {
 
     return (
         <div className="max-w-md mx-auto mt-10">
-        <form onSubmit={handleSubmit} className="mb-4 bg-gray-400 border-gray p-6 rounded-lg shadow-md">
+        <form onSubmit={handleSubmit} className="mb-4 bg-forms text-black border-gray p-6 rounded-lg shadow-md">
             <h2 className="text-2xl mb-4">Register</h2>
             {error && <p className="text-red-500 mb-4">{error}</p>}
             <div className="mb-4">
@@ -124,7 +124,7 @@ const Register = () => {
                         required
                     />
                 </div>
-            <button type="submit" className="bg-blue-500 text-white p-2 w-full rounded-md">Register</button>
+            <button type="submit" className="bg-secondary-light text-black border border-black p-2 w-full rounded-md">Register</button>
             <p className="text-center">
                 Already have an account?{" "}
                 <Link to="/login" className="text-blue-500 hover:underline">Login here</Link>

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from 'react-bootstrap'; 
 import { Link } from 'react-router-dom';
 import Image from '../assets/img01_wo_main.jpg';
 
@@ -12,16 +11,13 @@ const Home = () => {
         <img 
           src={Image} 
           alt="Person with notepad hovering over desk with files, laptop and cup of coffee"
-          className="rounded-lg shadow-lg w-1/4 h-auto" 
+          className="rounded-lg shadow-lg w-1/2 h-auto" 
         />
-        <Button 
-          as={Link} 
-          to="/login" 
-          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white" 
-          variant="primary"
-        >
-          Get Started
-        </Button>
+        <Link to="/login">
+          <button className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-secondary-dark text-black p-2 rounded-md hover:bg-primary-dark">
+            Get Started
+          </button>
+        </Link>
       </div>
     </div>
   );

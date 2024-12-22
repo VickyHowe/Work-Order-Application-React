@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Modal, Button } from "react-bootstrap";
+import { Modal} from "react-bootstrap";
 
 const TaskList = ({ user }) => {
   const [tasks, setTasks] = useState([]);
@@ -122,19 +122,19 @@ const TaskList = ({ user }) => {
   );
 
   return (
-    <div>
+    <div className="mx-auto mt-10 p-6 bg-forms text-black border-gray rounded-lg shadow-md w-full sm:max-w-md md:max-w-lg lg:max-w-4xl">
       <h2 className="text-xl font-bold mb-4">Task List</h2>
       <input
         type="text"
         placeholder="Search tasks..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="border p-2 mb-4 w-full"
+        className="border p-2 mb-4 w-full rounded-md "
       />
       
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-300">
-          <thead>
+      <div className="overflow-x-auto flex">
+        <table className="min-w-full bg-white border border-gray-300 rounded-md">
+          <thead className="border p-2 mb-4 w-full rounded-md">
             <tr className="bg-gray-200">
               <th className="py-2 px-4 border-b">Task Title</th>
               <th className="py-2 px-4 border-b">Description</th>
@@ -155,23 +155,23 @@ const TaskList = ({ user }) => {
                 {task.user ? task.user.username : 'Unassigned'}
                 </td>
                 <td className="py-2 px-4 border-b">
-                  {["admin", "manager"].includes(user.role) && (
-                    <Button
-                      onClick={() => openEditModal(task)}
-                      className="bg-blue-500 text-white p-1 rounded mr-2"
-                    >
-                      Edit
-                    </Button>
-                  )}
-                  {user.role !== "customer" && ( // Only show delete button for non-customers
-                    <Button
-                      onClick={() => handleDelete(task._id)}
-                      className="bg-red text-white p-1 rounded"
-                    >
-                      Delete
-                    </Button>
-                  )}
-                </td>
+  {["admin", "manager"].includes(user.role) && (
+    <button
+      onClick={() => openEditModal(task)}
+      className="bg-blue-500 text-white p-2 rounded mr-2"
+    >
+      Edit
+    </button>
+  )}
+  {user.role !== "customer" && (
+    <button
+      onClick={() => handleDelete(task._id)}
+      className="bg-red-500 text-white p-2 rounded"
+    >
+      Delete
+    </button>
+  )}
+</td>
               </tr>
             ))}
           </tbody>
@@ -180,18 +180,21 @@ const TaskList = ({ user }) => {
 
       {["manager", "admin"].includes(user.role) && ( 
         <div className="mt-4">
-          <Button variant="primary" onClick={() => setShowModal(true)}>
-            Create New Task
-          </Button>
-        </div>
+  <button 
+    onClick={() => setShowModal(true)} 
+    className="bg-secondary-light text-black p-2 rounded flex justify-end"
+  >
+    Create New Task
+  </button>
+</div>
       )}
 
       {/* Modal for creating a new task */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
+        <Modal.Header closeButton className="bg-forms text-black">
           <Modal.Title>Create New Task</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="text-black">
           <form onSubmit={handleCreateTask}>
             <label className="block mb-1">Task Title</label>
             <input
@@ -243,14 +246,14 @@ const TaskList = ({ user }) => {
             {error && <p className="text-red-500">{error}</p>}
           </form>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleCreateTask}>
-            Create Task
-          </Button>
-        </Modal.Footer>
+        <Modal.Footer className="bg-forms text-black">
+  <button onClick={() => setShowModal(false)} className="bg-gray-300 text-black p-2 rounded">
+    Close
+  </button>
+  <button onClick={handleCreateTask} className="bg-blue-500 text-white p-2 rounded">
+    Create Task
+  </button>
+</Modal.Footer>
       </Modal>
 
       {/* Modal for editing a task */}
@@ -315,13 +318,13 @@ const TaskList = ({ user }) => {
           </form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleEditTask}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
+  <button onClick={() => setShowEditModal(false)} className="bg-gray-300 text-black p-2 rounded">
+    Close
+  </button>
+  <button onClick={handleEditTask} className="bg-blue-500 text-white p-2 rounded">
+    Save Changes
+  </button>
+</Modal.Footer>
       </Modal>
     </div>
   );

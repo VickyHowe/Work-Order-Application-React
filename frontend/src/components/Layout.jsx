@@ -6,7 +6,7 @@ const Layout = ({ children }) => {
 
   return (
     <div className={`min-h-screen ${theme === 'light' ? 'bg-gray-200 text-black' : 'bg-gray-800 text-white'}`}>
-      <div className="text-black">
+      <div className={`${theme === 'light' ? 'text-black' : 'text-white'}`}>
         {children}
       </div>
     </div>

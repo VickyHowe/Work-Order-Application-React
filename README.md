@@ -138,3 +138,4 @@ https://www.loginradius.com/blog/engineering/guest-post/nodejs-authentication-gu
 
 https://dev.to/bushblade/add-eslint-to-a-react-vite-project-4pib
 
+https://kdesign.co/blog/pastel-color-palette-examples/

@@ -63,15 +63,8 @@ const Dashboard = ({ onLogout }) => {
     };
 
     return (
-        <div className="max-w-md mx-auto mt-10">
-            <h2 className="text-2xl mb-4">Dashboard</h2>
-            <p className="mb-2">Welcome, {userData.username}!</p>
-            <p className="mb-2">User  ID: {userData._id}</p>
-            <div className="mt-4">
-                <Button onClick={handleLogout} variant="danger" className="me-2">
-                    Logout
-                </Button>
-            </div>
+        <div className="w-full text-center mx-auto mt-10">
+            <h2 className="mb-2">Welcome, {userData.username}!</h2>
             <div className="mt-4">
                 {renderRoleBasedComponent()}
             </div>

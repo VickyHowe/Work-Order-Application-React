@@ -263,7 +263,6 @@ exports.getProfile = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
   const { id } = req.params;
-  console.log("Fetching user with ID:", id); // Debugging line
   try {
     const user = await User.findById(id).populate('userProfile');
     console.log("Fetched user data:", user);
@@ -271,14 +270,7 @@ exports.getUserById = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User  not found" });
     }
-        // Check if userProfile is populated
-        if (user.userProfile) {
-          console.log("User  profile found:", user.userProfile); // Log the user profile
-        } else {
-          console.log("User  profile is not populated for user ID:", id); // Log if userProfile is not populated
-        }
 
-    // const profilePicture = user.userProfile ? user.userProfile.profilePicture : null
       return res.status(200).json({
         _id: user._id,
         username: user.username,

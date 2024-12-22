@@ -9,7 +9,7 @@ const ThemeSwitcher = () => {
     <button
       onClick={toggleTheme}
       className={`p-2 rounded transition-colors duration-300 ${
-        theme === 'light' ? 'bg-blue-200 text-black' : 'bg-gray-800 text-white'
+        theme === 'light' ? 'bg-gray-800 text-white' : 'bg-primary-light text-black'
       }`}
     >
       {theme === 'light' ? <FaMoon size={20} /> : <FaSun size={20} />}
