@@ -1,5 +1,5 @@
 const Task = require('../models/Task'); // Import the Task model\
-const User = require('../models/User')
+const User = require('../models/User');
 const AppError = require('../utils/AppError');
 
 // Get all tasks

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Modal} from "react-bootstrap";
+import { Modal } from "react-bootstrap";
 
 const TaskList = ({ user }) => {
   const [tasks, setTasks] = useState([]);
@@ -18,7 +18,7 @@ const TaskList = ({ user }) => {
   const [users, setUsers] = useState([]);
   const [currentTaskId, setCurrentTaskId] = useState(null);
 
-  const apiCall = async (url, method = 'get', data = {}) => {
+  const apiCall = async (url, method = "get", data = {}) => {
     const response = await axios({
       method,
       url: `${import.meta.env.VITE_BACKEND_URL}${url}`,
@@ -31,31 +31,13 @@ const TaskList = ({ user }) => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [tasksData, usersData] = await Promise.all([
-          apiCall('/api/tasks'),
-          apiCall('/api/users/roles'),
-        ]);
-        setTasks(tasksData);
-        
-        // Filter users to include employees and managers
-        const filteredUsers = usersData.filter(user => 
-          user.role.name === "employee" || user.role.name === "manager"
-        );
-        setUsers(filteredUsers);
-        
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
+    fetchTasks();
+    fetchUsers();
   }, []);
 
   const handleDelete = async (id) => {
-    await apiCall(`/api/tasks/${id}`, 'delete');
-    setTasks(tasks.filter((task) => task._id !== id));
+    await apiCall(`/api/tasks/${id}`, "delete");
+    fetchTasks();
   };
 
   const handleCreateTask = async (e) => {
@@ -63,14 +45,21 @@ const TaskList = ({ user }) => {
     try {
       const newTask = {
         ...formData,
-        resources: formData.resources.split(",").map(item => item.trim()),
+        resources: formData.resources.split(",").map((item) => item.trim()),
         user: formData.assignedUserId,
         createdBy: user._id,
       };
-      const response = await apiCall('/api/tasks', 'post', newTask);
+      const response = await apiCall("/api/tasks", "post", newTask);
       setTasks([...tasks, response]);
-      setFormData({ title: "", description: "", deadline: "", resources: "", assignedUserId: "" });
+      setFormData({
+        title: "",
+        description: "",
+        deadline: "",
+        resources: "",
+        assignedUserId: "",
+      });
       setShowModal(false);
+      fetchTasks();
     } catch {
       setError("Error creating task");
     }
@@ -79,32 +68,68 @@ const TaskList = ({ user }) => {
   const handleEditTask = async (e) => {
     e.preventDefault();
     try {
-        // Find the username based on the assigned user ID
-        const assignedUser  = users.find(user => user._id === formData.assignedUserId); // Ensure this matches the select value
-        const username = assignedUser  ? assignedUser.username : null;
+      // Find the username based on the assigned user ID
+      const assignedUser = users.find(
+        (user) => user._id === formData.assignedUserId
+      ); // Ensure this matches the select value
+      const username = assignedUser ? assignedUser.username : null;
 
-        // Check if username is found
-        if (!username) {
-            setError("Assigned user not found");
-            return;
-        }
+      // Check if username is found
+      if (!username) {
+        setError("Assigned user not found");
+        return;
+      }
 
-        const updatedTask = {
-            title: formData.title,
-            description: formData.description,
-            deadline: formData.deadline,
-            resources: formData.resources.split(",").map(item => item.trim()),
-            username: username // Set the user to the username instead of user ID
-        };
+      const updatedTask = {
+        title: formData.title,
+        description: formData.description,
+        deadline: formData.deadline,
+        resources: formData.resources.split(",").map((item) => item.trim()),
+        username: username, // Set the user to the username instead of user ID
+      };
 
-        const response = await apiCall(`/api/tasks/${currentTaskId}`, 'put', updatedTask);
-        setTasks(tasks.map(task => (task._id === currentTaskId ? response : task)));
-        setFormData({ title: "", description: "", deadline: "", resources: "", assignedUserId: "" }); // Reset form data
-        setShowEditModal(false);
+      const response = await apiCall(
+        `/api/tasks/${currentTaskId}`,
+        "put",
+        updatedTask
+      );
+      setTasks(
+        tasks.map((task) => (task._id === currentTaskId ? response : task))
+      );
+      setFormData({
+        title: "",
+        description: "",
+        deadline: "",
+        resources: "",
+        assignedUserId: "",
+      }); // Reset form data
+      setShowEditModal(false);
     } catch {
-        setError("Error updating task");
+      setError("Error updating task");
     }
-};
+  };
+
+  const fetchTasks = async () => {
+    try {
+      const tasksData = await apiCall("/api/tasks");
+      setTasks(tasksData);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const usersData = await apiCall("/api/users/roles");
+      const filteredUsers = usersData.filter(
+        (user) => user.role.name === "employee" || user.role.name === "manager"
+      );
+      setUsers(filteredUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
   const openEditModal = (task) => {
     setCurrentTaskId(task._id);
     setFormData({
@@ -117,7 +142,7 @@ const TaskList = ({ user }) => {
     setShowEditModal(true);
   };
 
-  const filteredTasks = tasks.filter(task =>
+  const filteredTasks = tasks.filter((task) =>
     task.title.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -131,7 +156,7 @@ const TaskList = ({ user }) => {
         onChange={(e) => setSearch(e.target.value)}
         className="border p-2 mb-4 w-full rounded-md "
       />
-      
+
       <div className="overflow-x-auto flex">
         <table className="min-w-full bg-white border border-gray-300 rounded-md">
           <thead className="border p-2 mb-4 w-full rounded-md">
@@ -149,44 +174,48 @@ const TaskList = ({ user }) => {
               <tr key={task._id} className="hover:bg-gray-100">
                 <td className="py-2 px-4 border-b">{task.title}</td>
                 <td className="py-2 px-4 border-b">{task.description}</td>
-                <td className="py-2 px-4 border-b">{new Date(task.deadline).toLocaleDateString()}</td>
-                <td className="py-2 px-4 border-b">{task.resources.join(", ")}</td>
                 <td className="py-2 px-4 border-b">
-                {task.user ? task.user.username : 'Unassigned'}
+                  {new Date(task.deadline).toLocaleDateString()}
                 </td>
                 <td className="py-2 px-4 border-b">
-  {["admin", "manager"].includes(user.role) && (
-    <button
-      onClick={() => openEditModal(task)}
-      className="bg-blue-500 text-white p-2 rounded mr-2"
-    >
-      Edit
-    </button>
-  )}
-  {user.role !== "customer" && (
-    <button
-      onClick={() => handleDelete(task._id)}
-      className="bg-red-500 text-white p-2 rounded"
-    >
-      Delete
-    </button>
-  )}
-</td>
+                  {task.resources.join(", ")}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {task.user ? task.user.username : "Unassigned"}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {["admin", "manager"].includes(user.role) && (
+                    <button
+                      onClick={() => openEditModal(task)}
+                      className="bg-blue-500 text-white p-2 rounded mr-2"
+                    >
+                      Edit
+                    </button>
+                  )}
+                  {user.role !== "customer" && (
+                    <button
+                      onClick={() => handleDelete(task._id)}
+                      className="bg-red-500 text-white p-2 rounded"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {["manager", "admin"].includes(user.role) && ( 
+      {["manager", "admin"].includes(user.role) && (
         <div className="mt-4">
-  <button 
-    onClick={() => setShowModal(true)} 
-    className="bg-secondary-light text-black p-2 rounded flex justify-end"
-  >
-    Create New Task
-  </button>
-</div>
+          <button
+            onClick={() => setShowModal(true)}
+            className="bg-secondary-light text-black p-2 rounded flex justify-end"
+          >
+            Create New Task
+          </button>
+        </div>
       )}
 
       {/* Modal for creating a new task */}
@@ -201,7 +230,9 @@ const TaskList = ({ user }) => {
               type="text"
               placeholder="Enter task title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               required
               className="border p-2 mb-2 w-full"
             />
@@ -209,7 +240,9 @@ const TaskList = ({ user }) => {
             <textarea
               placeholder="Enter task description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               required
               className="border p-2 mb-2 w-full"
             />
@@ -217,7 +250,9 @@ const TaskList = ({ user }) => {
             <input
               type="date"
               value={formData.deadline}
-              onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, deadline: e.target.value })
+              }
               required
               className="border p-2 mb-2 w-full"
             />
@@ -226,16 +261,20 @@ const TaskList = ({ user }) => {
               type="text"
               placeholder="Enter resources (comma separated)"
               value={formData.resources}
-              onChange={(e) => setFormData({ ...formData, resources: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, resources: e.target.value })
+              }
               className="border p-2 mb-2 w-full"
             />
             <label className="block mb-1">Assigned To</label>
             <select
               value={formData.assignedUserId}
-              onChange={(e) => setFormData({ ...formData, assignedUserId: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, assignedUserId: e.target.value })
+              }
               required
               className="border p-2 mb-2 w-full"
- >
+            >
               <option value="">Select User</option>
               {users.map((user) => (
                 <option key={user._id} value={user._id}>
@@ -247,13 +286,19 @@ const TaskList = ({ user }) => {
           </form>
         </Modal.Body>
         <Modal.Footer className="bg-forms text-black">
-  <button onClick={() => setShowModal(false)} className="bg-gray-300 text-black p-2 rounded">
-    Close
-  </button>
-  <button onClick={handleCreateTask} className="bg-blue-500 text-white p-2 rounded">
-    Create Task
-  </button>
-</Modal.Footer>
+          <button
+            onClick={() => setShowModal(false)}
+            className="bg-gray-300 text-black p-2 rounded"
+          >
+            Close
+          </button>
+          <button
+            onClick={handleCreateTask}
+            className="bg-blue-500 text-white p-2 rounded"
+          >
+            Create Task
+          </button>
+        </Modal.Footer>
       </Modal>
 
       {/* Modal for editing a task */}
@@ -268,7 +313,9 @@ const TaskList = ({ user }) => {
               type="text"
               placeholder="Enter task title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               required
               className="border p-2 mb-2 w-full"
             />
@@ -276,7 +323,9 @@ const TaskList = ({ user }) => {
             <textarea
               placeholder="Enter task description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               required
               className="border p-2 mb-2 w-full"
             />
@@ -284,7 +333,9 @@ const TaskList = ({ user }) => {
             <input
               type="date"
               value={formData.deadline}
-              onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, deadline: e.target.value })
+              }
               required
               className="border p-2 mb-2 w-full"
             />
@@ -293,7 +344,9 @@ const TaskList = ({ user }) => {
               type="text"
               placeholder="Enter resources (comma separated)"
               value={formData.resources}
-              onChange={(e) => setFormData({ ...formData, resources: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, resources: e.target.value })
+              }
               className="border p-2 mb-2 w-full"
             />
             {["admin", "manager"].includes(user.role) && (
@@ -301,7 +354,9 @@ const TaskList = ({ user }) => {
                 <label className="block mb-1">Assigned To</label>
                 <select
                   value={formData.assignedUserId}
-                  onChange={(e) => setFormData({ ...formData, assignedUserId: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, assignedUserId: e.target.value })
+                  }
                   required
                   className="border p-2 mb-2 w-full"
                 >
@@ -318,17 +373,22 @@ const TaskList = ({ user }) => {
           </form>
         </Modal.Body>
         <Modal.Footer>
-  <button onClick={() => setShowEditModal(false)} className="bg-gray-300 text-black p-2 rounded">
-    Close
-  </button>
-  <button onClick={handleEditTask} className="bg-blue-500 text-white p-2 rounded">
-    Save Changes
-  </button>
-</Modal.Footer>
+          <button
+            onClick={() => setShowEditModal(false)}
+            className="bg-gray-300 text-black p-2 rounded"
+          >
+            Close
+          </button>
+          <button
+            onClick={handleEditTask}
+            className="bg-blue-500 text-white p-2 rounded"
+          >
+            Save Changes
+          </button>
+        </Modal.Footer>
       </Modal>
     </div>
   );
-
 };
 
 export default TaskList;
