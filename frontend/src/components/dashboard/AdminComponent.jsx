@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import taskListImage from "../assets/img02_taskList.webp";
-import userManagementImage from "../assets/img04_manageUsers.jpg";
-import pricelistManagementImage from "../assets/img05_pricelist.jpg";
-import calendarImage from "../assets/img03_workorder.jpg";
+import taskListImage from "../../assets/img02_taskList.webp";
+import userManagementImage from "../../assets/img04_manageUsers.jpg";
+import pricelistManagementImage from "../../assets/img05_pricelist.jpg";
+import calendarImage from "../../assets/img03_workorder.jpg";
 
 const AdminComponent = () => {
   return (

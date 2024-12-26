@@ -8,7 +8,7 @@ import {
   FaUserPlus,
   FaSignOutAlt, 
 } from "react-icons/fa";
-import ThemeSwitcher from '../components/ThemeSwitcher ';
+import ThemeSwitcher from './user/ThemeSwitcher ';
 
 
 const CustomNavbar = ({ user, onLogout }) => {

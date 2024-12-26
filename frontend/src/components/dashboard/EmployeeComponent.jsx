@@ -1,4 +1,4 @@
-import TaskList from './Tasklist';
+import TaskList from '../tasks/Tasklist';
 import { Link } from 'react-router-dom';
 
 const EmployeeComponent = () => {

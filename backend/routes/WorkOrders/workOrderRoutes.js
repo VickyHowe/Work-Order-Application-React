@@ -43,7 +43,21 @@ router
     workOrderController.getWorkOrdersForUser 
   ); // Get work orders for the logged-in user
 
+// New route for creating a task for a specific work order
+router
+  .route("/:workOrderId/tasks")
+  .post(
+    roleCheck(["manager", "employee"], "create"), // Adjust roles as necessary
+    workOrderController.createTaskForWorkOrder
+  ); // Create a new task for a work order
 
+// New route for getting all tasks for a specific work order
+router
+  .route("/:workOrderId/tasks")
+  .get(
+    roleCheck(["manager", "employee"], "read"), // Adjust roles as necessary
+    workOrderController.getTasksForWorkOrder
+  ); // Get all tasks for a work order
 
 
   module.exports = router;

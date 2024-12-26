@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import WorkOrderList from './WorkOrderList'; // Import the WorkOrderList component
-import useFetchWorkOrders from './useFetchWorkOrders'; // Import the custom hook
+import WorkOrderList from '../workOrders/WorkOrderList'; // Import the WorkOrderList component
+import useFetchWorkOrders from '../../hooks/useFetchWorkOrders'; // Import the custom hook
 import PropTypes from 'prop-types';
 
 const localizer = momentLocalizer(moment);

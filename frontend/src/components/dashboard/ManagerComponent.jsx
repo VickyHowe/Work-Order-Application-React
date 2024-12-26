@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import PricelistManagement from './PricelistManagement';
-import TaskList from './Tasklist';
+import PricelistManagement from '../pricelist/PricelistManagement';
+import TaskList from '../tasks/Tasklist';
 
 const ManagerComponent = () => {
     return (

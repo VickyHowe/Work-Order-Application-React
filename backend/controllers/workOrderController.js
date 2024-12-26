@@ -21,6 +21,31 @@ exports.createWorkOrderRequest = async (req, res) => {
         res.status(500).json({ message: 'Error creating work order request', error: error.message });
     }
 };
+exports.createTaskForWorkOrder = async (req, res) => {
+    const { title, description, deadline, resources, user } = req.body;
+    const workOrderId = req.params.workOrderId; // Get the work order ID from the request parameters
+
+    try {
+        const newTask = await Task.create({
+            title,
+            description,
+            deadline,
+            resources,
+            createdBy: req.user._id, // Set the creator to the authenticated user
+            user, // Set the assigned user
+            workOrder: workOrderId // Associate the task with the work order
+        });
+
+        // Add the task ID to the work order
+        await WorkOrder.findByIdAndUpdate(workOrderId, {
+            $push: { tasks: newTask._id }
+        });
+
+        res.status(201).json(newTask);
+    } catch (error) {
+        return next(new AppError('Error creating task for work order', 500));
+    }
+};
 
 // Update work order with internal comments or status
 exports.updateWorkOrder = async (req, res) => {
@@ -61,7 +86,19 @@ exports.deleteWorkOrder = async (req, res) => {
         res.status(500).json({ message: 'Error deleting work order', error: error.message });
     }
 };
+exports.getTasksForWorkOrder = async (req, res) => {
+    const workOrderId = req.params.workOrderId;
 
+    try {
+        const tasks = await Task.find({ workOrder: workOrderId })
+            .populate('user', 'username _id role')
+            .populate('createdBy', 'username _id role');
+
+        res.status(200).json(tasks);
+    } catch (error) {
+        return next(new AppError('Error fetching tasks for work order', 500));
+    }
+};
 // Get all work orders for a manager
 exports.getAllWorkOrdersForManager = async (req, res) => {
     try {

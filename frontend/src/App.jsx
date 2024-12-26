@@ -1,22 +1,22 @@
 import { useState } from "react";
 import Layout from "./components/Layout";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Register from "./components/Register";
-import Login from "./components/Login";
-import UserProfile from "./components/UserProfile";
-import Dashboard from "./components/Dashboard";
-import RequestPasswordReset from "./components/RequestPasswordReset";
-import ResetPassword from "./components/ResetPassword";
+import Register from "./components/auth/Register";
+import Login from "./components/auth/Login";
+import UserProfile from "./components/user/UserProfile";
+import Dashboard from "./components/dashboard/Dashboard";
+import RequestPasswordReset from "./components/auth/RequestPasswordReset";
+import ResetPassword from "./components/auth/ResetPassword";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import Home from "./components/Home";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
-import UserManagement from "./components/UserManagement";
-import TaskList from "./components/Tasklist";
-import PricelistManagement from "./components/PricelistManagement";
-import CalendarView from "./components/CalendarView";
-import WorkOrderList from "./components/WorkOrderList";
+import UserManagement from "./components/user/UserManagement";
+import TaskList from "./components/tasks/Tasklist";
+import PricelistManagement from "./components/pricelist/PricelistManagement";
+import CalendarView from "./components/calendar/CalendarView";
+import WorkOrderList from "./components/workOrders/WorkOrderList";
 
 const App = () => {
   const [user, setUser] = useState(null);

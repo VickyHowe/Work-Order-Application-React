@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import axios from 'axios';
-import AdminComponent from './AdminComponent';
-import ManagerComponent from './ManagerComponent';
-import EmployeeComponent from './EmployeeComponent';
-import CustomerComponent from './CustomerComponent';
+import AdminComponent from '../dashboard/AdminComponent';
+import ManagerComponent from '../dashboard/ManagerComponent';
+import EmployeeComponent from '../dashboard/EmployeeComponent';
+import CustomerComponent from '../dashboard/CustomerComponent';
 
 const Dashboard = ({ onLogout }) => {
     const navigate = useNavigate();

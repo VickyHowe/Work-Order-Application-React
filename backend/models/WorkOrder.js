@@ -13,6 +13,7 @@ const workOrderSchema = new mongoose.Schema({
     priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' }, // Task priority
     predefinedServices: { type: [String], default: [] }, // Array of predefined services
     attachments: { type: [String], default: [] }, // Array of file paths for attachments
+    tasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tasklist' }],
 }, { timestamps: true });
 
 const WorkOrder = mongoose.model('WorkOrder', workOrderSchema);
