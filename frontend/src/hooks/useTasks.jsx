@@ -1,12 +1,11 @@
-// src/hooks/useTasks.js
 import { useEffect, useState } from "react";
-import useApi from "./useApi"; // Import the custom hook for API calls
+import useApi from "./useApi"; 
 
 const useTasks = (token) => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { apiCall } = useApi(); // Use the custom hook
+  const { apiCall } = useApi(); 
 
   const fetchTasks = async () => {
     try {
@@ -32,7 +31,8 @@ const useTasks = (token) => {
 
   const updateTask = async (taskId, taskData) => {
     try {
-      const response = await apiCall(`/api/tasks/${taskId}`, "put", taskData);
+      const response = await apiCall(`/api/tasks/${taskId}`, "put", taskData); 
+      console.log("Updating task with ID:", taskId);
       setTasks((prevTasks) =>
         prevTasks.map((task) => (task._id === taskId ? response : task))
       );
