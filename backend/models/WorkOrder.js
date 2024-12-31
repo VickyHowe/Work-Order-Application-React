@@ -4,16 +4,16 @@ const workOrderSchema = new mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
     status: { type: String, enum: ['pending', 'in-progress', 'completed'], default: 'pending' },
-    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to the User model
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to the User model for the creator
+    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, 
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, 
     deadline: { type: Date, required: true },
-    resources: { type: [String], default: [] }, // Array of resources needed
-    customerComments: { type: [String], default: [] }, // Array of customer comments
-    internalComments: { type: [String], default: [] }, // Array of internal comments
-    priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' }, // Task priority
-    predefinedServices: { type: [String], default: [] }, // Array of predefined services
-    attachments: { type: [String], default: [] }, // Array of file paths for attachments
-    tasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tasklist' }],
+    resources: { type: [String], default: [] },
+    customerComments: { type: [String], default: [] }, 
+    internalComments: { type: [String], default: [] }, 
+    priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' }, 
+    predefinedServices: { type: [String], default: [] }, 
+    attachments: { type: [String], default: [] }, 
+    tasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
 }, { timestamps: true });
 
 const WorkOrder = mongoose.model('WorkOrder', workOrderSchema);

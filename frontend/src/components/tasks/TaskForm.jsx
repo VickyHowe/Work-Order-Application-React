@@ -1,4 +1,6 @@
 import React from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const TaskForm = ({ formData, setFormData, users, onSubmit, fieldErrors }) => {
   console.log("Users in TaskForm:", users);
@@ -22,13 +24,17 @@ const TaskForm = ({ formData, setFormData, users, onSubmit, fieldErrors }) => {
         className={`border p-2 mb-2 w-full ${fieldErrors.description ? 'border-red-500' : ''}`}
       />
       <label className="block mb-1">Deadline</label>
-      <input
-        type="date"
-        value={formData.deadline}
-        onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-        required
-        className={`border p-2 mb-2 w-full ${fieldErrors.deadline ? 'border-red-500' : ''}`}
+      <DatePicker
+        selected={formData.deadline ? new Date(formData.deadline) : null}
+        onChange={(date) => setFormData({ ...formData, deadline: date.toISOString().split("T")[0] })}
+        minDate={new Date()} // Prevent selecting past dates
+        dateFormat="yyyy-MM-dd"
+        className={`border p-2 mb-2 w-full ${fieldErrors.deadline ? "border-red-500" : ""}`}
+        placeholderText="Select a deadline"
       />
+      {fieldErrors.deadline && (
+        <p className="text-red-500 text-sm mb-2">Deadline is required.</p>
+      )}
       <label className="block mb-1">Resources (comma separated)</label>
       <input
         type="text"
@@ -37,28 +43,27 @@ const TaskForm = ({ formData, setFormData, users, onSubmit, fieldErrors }) => {
         onChange={(e) => setFormData({ ...formData, resources: e.target.value })}
         className="border p-2 mb-2 w-full"
       />
-      <label className="block mb-1">Assigned To</label>
-      <select
-        value={formData.assignedUserId} 
-        onChange={(e) => {
-          const selectedUserId = e.target.value;
-          const selectedUser = users.find(user => user._id === selectedUserId); 
-          setFormData({ 
-            ...formData, 
-            assignedUserId: selectedUserId, 
-            username: selectedUser  ? selectedUser .username : "" 
-          });
-        }}
-        required
-        className={`border p-2 mb-2 w-full ${fieldErrors.assignedUserId ? 'border-red-500' : ''}`}
-      >
-        <option value="">Select User</option>
-        {users.map((user) => (
-          <option key={user._id} value={user._id}>
-            {user.username}
-          </option>
-        ))}
-      </select>
+<label className="block mb-1">Assigned To</label>
+<select
+  value={formData.assignedUserId}
+  onChange={(e) => {
+    const selectedUserId = e.target.value;
+    const selectedUser  = users.find((user) => user._id === selectedUserId);
+    setFormData({
+      ...formData,
+      assignedUserId: selectedUserId,
+      username: selectedUser  ? selectedUser .username : "",
+    });
+  }}
+  className={`border p-2 mb-2 w-full`} // Removed fieldErrors.assignedUserId
+>
+  <option value="">Select User</option>
+  {users.map((user) => (
+    <option key={user._id} value={user._id}>
+      {user.username}
+    </option>
+  ))}
+</select>
       <label className="block mb-1">Status</label>
       <select
         value={formData.status}

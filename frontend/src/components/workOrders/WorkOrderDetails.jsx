@@ -1,56 +1,74 @@
-import WorkOrderDetails from "../workOrders/WorkOrderDetails";
+import React, { useState } from "react";
 
-const CalendarView = ({ user }) => {
-  const token = localStorage.getItem("token");
-  const { workOrders, fetchWorkOrders } = useFetchWorkOrders(token);
-  const [showWorkOrderList, setShowWorkOrderList] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+const WorkOrderDetails = ({ order, onClose, onUpdate, onDelete }) => {
+  const [editMode, setEditMode] = useState(false);
+  const [editedOrder, setEditedOrder] = useState(order);
 
-  const handleUpdateOrder = async (updatedOrder) => {
-    try {
-      const response = await apiCall(`/api/workorders/${updatedOrder._id}`, "put", updatedOrder);
-      setWorkOrders((prevOrders) => 
-        prevOrders.map((order) => (order._id === updatedOrder._id ? response : order))
-      );
-      setSelectedOrder(null);
-    } catch (error) {
-      console.error("Error updating work order:", error);
-    }
+  const handleSave = () => {
+    onUpdate(editedOrder);
+    setEditMode(false);
+  };
+
+  const handleDelete = () => {
+    onDelete(order._id);
+    onClose();
   };
 
   return (
-    <div className="p-4">
-      {/* Existing code for creating and showing work orders */}
-      {showWorkOrderList && (
-        <div className="mb-4">
-          <WorkOrderList
-            user={user}
-            selectedOrder={selectedOrder}
-            setSelectedOrder={setSelectedOrder}
-            fetchWorkOrders={fetchWorkOrders}
+    <div className="p-4 bg-white text-black shadow-md rounded-lg">
+      {editMode ? (
+        <>
+          <input
+            value={editedOrder.title}
+            onChange={(e) => setEditedOrder({ ...editedOrder, title: e.target.value })}
+            className="border p-2 mb-2 w-full"
           />
-        </div>
+          <textarea
+            value={editedOrder.description}
+            onChange={(e) => setEditedOrder({ ...editedOrder, description: e.target.value })}
+            className="border p-2 mb-2 w-full"
+          />
+          <button
+            onClick={handleSave}
+            className="bg-green-500 text-white px-3 py-1 rounded mr-2"
+          >
+            Save
+          </ button>
+          <button
+            onClick={() => setEditMode(false)}
+            className="bg-gray-300 text-black px-3 py-1 rounded"
+          >
+            Cancel
+          </button>
+        </>
+      ) : (
+        <>
+          <h2 className="text-xl font-bold mb-2">{order.title}</h2>
+          <p className="mb-2">
+            <strong>Description:</strong> {order.description}
+          </p>
+          <p className="mb-2">
+            <strong>Deadline:</strong> {new Date(order.deadline).toLocaleDateString()}
+          </p>
+          <button
+            onClick={() => setEditMode(true)}
+            className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => handleDelete(order._id)}
+            className="bg-red-500 text-white px-3 py-1 rounded"
+          >
+            Delete
+          </button>
+        </>
       )}
-      {selectedOrder && (
-        <WorkOrderDetails
-          order={selectedOrder}
-          onClose={() => setSelectedOrder(null)}
-          onUpdate={handleUpdateOrder}
-        />
-      )}
-      <div className="bg-primary-light text-black shadow-md rounded-lg overflow-hidden">
-        <Calendar
-          localizer={localizer}
-          events={events}
-          startAccessor="start"
-          endAccessor="end"
-          style={{ height: 500 }}
-          onSelectEvent={handleSelectEvent}
-        />
-      </div>
+      <button onClick={onClose} className="mt-4 bg-gray-200 text-black px-3 py-1 rounded">
+        Close
+      </button>
     </div>
   );
 };
 
-export default CalendarView;
+export default WorkOrderDetails;

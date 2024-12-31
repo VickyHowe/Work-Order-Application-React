@@ -1,4 +1,6 @@
 const WorkOrder = require('../models/WorkOrder');
+const Task = require('../models/Task');
+const AppError = require('../utils/AppError');
 
 // Create a new work order request from a customer
 exports.createWorkOrderRequest = async (req, res) => {
@@ -9,7 +11,7 @@ exports.createWorkOrderRequest = async (req, res) => {
             description,
             customerComments,
             status: 'pending',
-            createdBy: req.user._id, // Assuming req.user is set by auth middleware
+            createdBy: req.user._id, 
             deadline: req.body.deadline,
             priority,
             reminders,
@@ -21,9 +23,11 @@ exports.createWorkOrderRequest = async (req, res) => {
         res.status(500).json({ message: 'Error creating work order request', error: error.message });
     }
 };
-exports.createTaskForWorkOrder = async (req, res) => {
-    const { title, description, deadline, resources, user } = req.body;
-    const workOrderId = req.params.workOrderId; // Get the work order ID from the request parameters
+
+// Create a new task for work order
+exports.createTaskForWorkOrder = async (req, res, next) => {
+    const { title, description, deadline, resources, user, status } = req.body;
+    const workOrderId = req.params.workOrderId;
 
     try {
         const newTask = await Task.create({
@@ -31,28 +35,34 @@ exports.createTaskForWorkOrder = async (req, res) => {
             description,
             deadline,
             resources,
-            createdBy: req.user._id, // Set the creator to the authenticated user
-            user, // Set the assigned user
-            workOrder: workOrderId // Associate the task with the work order
+            createdBy: req.user._id,
+            user,
+            workOrder: workOrderId,
+            status: status || 'pending'
         });
 
-        // Add the task ID to the work order
-        await WorkOrder.findByIdAndUpdate(workOrderId, {
-            $push: { tasks: newTask._id }
-        });
+        console.log("New Task Created:", newTask); 
+
+        const updatedWorkOrder = await WorkOrder.findByIdAndUpdate(
+            workOrderId,
+            { $push: { tasks: newTask._id } },
+            { new: true } 
+        );
+
+        console.log("Updated Work Order:", updatedWorkOrder); 
 
         res.status(201).json(newTask);
     } catch (error) {
+        console.error(error); 
         return next(new AppError('Error creating task for work order', 500));
     }
 };
 
-// Update work order with internal comments or status
+// Update work order
 exports.updateWorkOrder = async (req, res) => {
     const { id } = req.params;
     const { status, internalComments, priority, reminders, predefinedServices, attachments } = req.body;
 
-    // Prepare the update object
     const updateData = {
         status,
         priority,
@@ -61,7 +71,6 @@ exports.updateWorkOrder = async (req, res) => {
         attachments,
     };
 
-    // Only add internalComments to the update if it is an array
     if (Array.isArray(internalComments)) {
         updateData.$push = { internalComments: { $each: internalComments } };
     }
@@ -86,7 +95,9 @@ exports.deleteWorkOrder = async (req, res) => {
         res.status(500).json({ message: 'Error deleting work order', error: error.message });
     }
 };
-exports.getTasksForWorkOrder = async (req, res) => {
+
+// Get all tasks for work Orders
+exports.getTasksForWorkOrder = async (req, res, next) => {
     const workOrderId = req.params.workOrderId;
 
     try {
@@ -99,6 +110,7 @@ exports.getTasksForWorkOrder = async (req, res) => {
         return next(new AppError('Error fetching tasks for work order', 500));
     }
 };
+
 // Get all work orders for a manager
 exports.getAllWorkOrdersForManager = async (req, res) => {
     try {
@@ -114,7 +126,7 @@ exports.getAllWorkOrdersForManager = async (req, res) => {
 // Get all work orders for the logged-in user
 exports.getWorkOrdersForUser  = async (req, res) => {
     try {
-        const workOrders = await WorkOrder.find({ createdBy: req.user._id }) // Adjust based on your logic
+        const workOrders = await WorkOrder.find({ createdBy: req.user._id }) 
             .populate('assignedTo', 'username')
             .populate('createdBy', 'username');
         res.status(200).json(workOrders);

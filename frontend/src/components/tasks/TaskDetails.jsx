@@ -10,18 +10,22 @@ const TaskDetails = ({ task, onClose }) => {
         <strong>Description:</strong> {task.description}
       </p>
       <p className="mb-2">
-        <strong>Deadline:</strong>{" "}
-        {new Date(task.deadline).toLocaleDateString()}
+        <strong>Deadline:</strong> {new Date(task.deadline).toLocaleDateString()}
       </p>
       <p className="mb-2">
         <strong>Resources:</strong> {task.resources.join(", ")}
       </p>
       <p className="mb-2">
-        <strong>Assigned To:</strong>{" "}
-        {task.user ? task.user.username : "Unassigned"}
+        <strong>Assigned To:</strong> {task.user ? task.user.username : "Unassigned"}
       </p>
       <p className="mb-2">
         <strong>Status:</strong> {task.status}
+      </p>
+      <p className="mb-2">
+        <strong>Created By:</strong> {task.createdBy ? task.createdBy.username : "Unknown"}
+      </p>
+      <p className="mb-2">
+        <strong>Work Order:</strong> {task.workOrder ? task.workOrder.title : "None"}
       </p>
       <button
         onClick={onClose}

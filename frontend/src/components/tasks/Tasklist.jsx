@@ -32,7 +32,6 @@ const TaskList = ({ user }) => {
     title: false,
     description: false,
     deadline: false,
-    assignedUserId: false,
   });
 
   const [users, setUsers] = useState([]);
@@ -62,11 +61,10 @@ const TaskList = ({ user }) => {
       title: !formData.title,
       description: !formData.description,
       deadline: !formData.deadline,
-      assignedUserId: !formData.assignedUserId,
     };
-
+  
     setFieldErrors(errors);
-
+  
     if (Object.values(errors).some((error) => error)) {
       setErrorMessage("Please fill in all fields.");
       return;
@@ -98,22 +96,20 @@ const TaskList = ({ user }) => {
     });
     setShowModal(true);
   };
-
   const handleEditTask = async () => {
     const errors = {
       title: !formData.title,
       description: !formData.description,
       deadline: !formData.deadline,
-      assignedUserId: !formData.assignedUserId,
     };
-
+  
     setFieldErrors(errors);
-
+  
     if (Object.values(errors).some((error) => error)) {
       setErrorMessage("Please fill in all fields.");
       return;
     }
-    setErrorMessage(""); // Clear error message
+    setErrorMessage("");
     try {
       console.log("Form data being sent:", formData);
       console.log("Updating task with ID:", selectedTask._id);
