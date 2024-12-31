@@ -1,10 +1,9 @@
-// src/components/workOrders/WorkOrderList.js
 import React, { useEffect, useMemo, useState } from "react";
 import { useTable, useSortBy, usePagination } from "react-table";
-import { Button, Modal, Spinner } from "react-bootstrap";
+import { Modal, Spinner } from "react-bootstrap";
 import useApi from "../../hooks/useApi"; 
 import TaskForm from "../tasks/TaskForm";
-import { FaEye, FaPlus, FaTrash, FaSave, FaSortDown, FaSortUp } from "react-icons/fa";
+import { FaEye, FaTrash, FaSave, FaSortDown, FaSortUp } from "react-icons/fa";
 
 const WorkOrderList = ({ user }) => {
   const token = localStorage.getItem("token");
@@ -85,13 +84,19 @@ const WorkOrderList = ({ user }) => {
         Header: "Actions",
         accessor: "actions",
         Cell: ({ row }) => (
-          <div>
-            <Button variant="primary" onClick={() => setSelectedOrder(row.original)}>
-              <FaEye />
-            </Button>
-            <Button variant="danger" onClick={() => handleDeleteOrder(row.original._id)}>
-              <FaTrash />
-            </Button>
+          <div className="flex space-x-2">
+            <button
+              className="bg-forms text-black px-3 py-1 rounded flex items-center"
+              onClick={() => setSelectedOrder(row.original)}
+            >
+              <FaEye className="mr-1" /> View
+            </button>
+            <button
+              className="bg-red-500 text-white px-3 py-1 rounded flex items-center"
+              onClick={() => handleDeleteOrder(row.original._id)}
+            >
+              <FaTrash className="mr-1" /> Delete
+            </button>
           </div>
         ),
       },
@@ -130,10 +135,7 @@ const WorkOrderList = ({ user }) => {
         <p>{error}</p>
       ) : (
         <>
-          <Button onClick={() => setShowCreateModal(true)} className="bg-secondary">
-            <FaPlus /> Create New Work Order
-          </Button>
-          <table {... getTableProps()} className="table">
+          <table {...getTableProps()} className="table">
             <thead>
               {headerGroups.map((headerGroup) => (
                 <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
@@ -149,19 +151,19 @@ const WorkOrderList = ({ user }) => {
               ))}
             </thead>
             <tbody {...getTableBodyProps()}>
-              {page.map((row) => {
-                prepareRow(row);
-                return (
-                  <tr {...row.getRowProps()} key={row.original._id}>
-                    {row.cells.map((cell) => (
-                      <td {...cell.getCellProps()} key={cell.column.id}>
-                        {cell.render("Cell")}
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })}
-            </tbody>
+  {page.map((row) => {
+    prepareRow(row);
+    return (
+      <tr {...row.getRowProps()} key={row.original._id}> {/* Add key here */}
+        {row.cells.map((cell) => (
+          <td {...cell.getCellProps()} key={cell.column.id}> {/* Add key here */}
+            {cell.render("Cell")}
+          </td>
+        ))}
+      </tr>
+    );
+  })}
+</tbody>
           </table>
         </>
       )}
@@ -173,12 +175,12 @@ const WorkOrderList = ({ user }) => {
           <TaskForm formData={newOrder} setFormData={setNewOrder} onSubmit={handleCreateOrder} />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
+          <button className="bg-gray-300 text-black px-3 py-1 rounded" onClick={() => setShowCreateModal(false)}>
             Close
-          </Button>
-          <Button variant="primary" onClick={handleCreateOrder}>
+          </button>
+          <button className="bg-green-500 text-white px-3 py-1 rounded" onClick={handleCreateOrder}>
             <FaSave /> Create Work Order
-          </Button>
+          </button>
         </Modal.Footer>
       </Modal>
     </div>
