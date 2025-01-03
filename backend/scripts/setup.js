@@ -105,131 +105,64 @@ const pricelistItems = [
     }
 ];
 
-// Define work orders
-const workOrders = [
-    {
-        title: "Ski Tune-Up",
-        description: "Full ski tune-up including edge sharpening and waxing.",
-        status: "completed",
-        assignedTo: null, // Will be assigned to an employee
-        createdBy: null, // Will be assigned to a customer
-        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-        completedAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // Completed 2 days before the deadline
-        isOnTime: true, // Mark as completed on time
-        priority: "medium",
-        predefinedServices: ["Edge Sharpening", "Waxing"], // References to pricelist items
-        customerComments: ["Please make sure the edges are sharp!"],
-        internalComments: [],
-        attachments: [],
-        resources: ["Ski Gr inder", "Waxing Station"], // Resources for this work order
-        tasks: [] // Will be populated with tasks
-    },
-    {
-        title: "Snowboard Repair",
-        description: "Repair a crack in the snowboard base.",
-        status: "completed",
-        assignedTo: null, // Will be assigned to an employee
-        createdBy: null, // Will be assigned to a customer
-        deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
-        completedAt: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // Completed 1 day before the deadline
-        isOnTime: true, // Mark as completed on time
-        priority: "high",
-        predefinedServices: ["Base Repair"], // References to pricelist items
-        customerComments: ["The crack is near the tail."],
-        internalComments: [],
-        attachments: [],
-        resources: ["Base Repair Kit"], // Resources for this work order
-        tasks: [] // Will be populated with tasks
-    },
-    {
-        title: "Ski Waxing",
-        description: "Apply wax to the skis for better glide.",
-        status: "pending",
-        assignedTo: null,
-        createdBy: null,
-        deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-        priority: "low",
-        predefinedServices: ["Waxing"],
-        customerComments: [],
-        internalComments: [],
-        attachments: [],
-        resources: ["Waxing Station"],
-        tasks: []
-    },
-    {
-        title: "Snowboard Edge Sharpening",
-        description: "Sharpen the edges of the snowboard.",
-        status: "pending",
-        assignedTo: null,
-        createdBy: null,
-        deadline: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // 4 days from now
-        priority: "medium",
-        predefinedServices: ["Edge Sharpening"],
-        customerComments: [],
-        internalComments: [],
-        attachments: [],
-        resources: ["Ski Grinder"],
-        tasks: []
-    }
-];
+// Function to generate random date within a year
+const generateRandomDate = (startDate, endDate) => {
+    return new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
+};
 
-// Define tasks
-const tasks = [
-    {
-        title: "Sharpen Edges",
-        description: "Sharpen the edges of the skis.",
-        status: "completed",
-        user: null, // Will be assigned to an employee
-        deadline: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-        completedAt: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // Completed 1 day after creation
-        isOnTime: true, // Mark as completed on time
-        resources: ["Ski Grinder"],
-        createdBy: null,
-        workOrder: null
-    },
-    {
-        title: "Apply Wax",
-        description: "Apply wax to the skis for better glide.",
-        status: "completed",
-        user: null,
-        deadline: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-        completedAt: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // Completed 1 day after creation
-        isOnTime: true,
-        resources: ["Waxing Station"],
-        createdBy: null,
-        workOrder: null
-    },
-    {
-        title: "Inspect Snowboard",
-        description: "Inspect the snowboard for any damages.",
-        status: "pending",
-        user: null,
-        deadline: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
-        resources: [],
-        createdBy: null,
-        workOrder: null
-    },
-    {
-        title: "Repair Base",
-        description: "Repair the base of the snowboard.",
-        status: "pending",
-        user: null,
-        deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-        resources: ["Base Repair Kit"],
-        createdBy: null,
-        workOrder: null
-    },
-    {
-        title: "Redress Stone for Grinder",
-        description: "Maintenance task to redress the stone for the grinder.",
-        status: "pending",
-        user: null,
-        deadline: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days from now
-        resources: ["Grinder Maintenance Kit"],
-        createdBy: null, // Not linked to a specific work order
-        workOrder: null
+// Function to generate work orders and tasks
+const generateWorkOrdersAndTasks = (numWorkOrders, numTasks) => {
+    const workOrders = [];
+    const tasks = [];
+    const services = ["Edge Sharpening", "Waxing", "Base Repair", "Ski Tune-Up", "Snowboard Repair"];
+    const statuses = ["completed", "in-progress", "pending"];
+
+    // Generate work orders
+    for (let i = 0; i < numWorkOrders; i++) {
+        const status = statuses[Math.floor(Math.random() * statuses.length)];
+        const workOrder = {
+            title: `Work Order ${i + 1}`,
+            description: `Description for work order ${i + 1}.`,
+            status: status,
+            assignedTo: null, // Will be assigned to an employee
+            createdBy: null, // Will be assigned to a customer
+            deadline: generateRandomDate(new Date(), new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)), // Random deadline within a year
+ completedAt: status === "completed" ? generateRandomDate(new Date(), new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)) : null,
+            isOnTime: status === "completed" ? Math.random() > 0.5 : null, // Randomly assign on-time status
+            priority: ["low", "medium", "high"][Math.floor(Math.random() * 3)],
+            predefinedServices: [services[Math.floor(Math.random() * services.length)]],
+            customerComments: [],
+            internalComments: [],
+            attachments: [],
+            resources: [],
+            tasks: [] // Will be populated with tasks
+        };
+        workOrders.push(workOrder);
     }
-];
+
+    // Generate tasks
+    for (let i = 0; i < numTasks; i++) {
+        const status = statuses[Math.floor(Math.random() * statuses.length)];
+        const task = {
+            title: `Task ${i + 1}`,
+            description: `Description for task ${i + 1}.`,
+            status: status,
+            user: null, // Will be assigned to an employee
+            deadline: generateRandomDate(new Date(), new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)), // Random deadline within a year
+            completedAt: status === "completed" ? generateRandomDate(new Date(), new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)) : null,
+            isOnTime: status === "completed" ? Math.random() > 0.5 : null,
+            resources: [],
+            createdBy: null, // Will be assigned to a user
+            workOrder: null // Will be linked to a work order
+        };
+        tasks.push(task);
+    }
+
+    return { workOrders, tasks };
+};
+
+// Generate work orders and tasks
+const { workOrders, tasks } = generateWorkOrdersAndTasks(50, 100); // 50 work orders and 100 tasks
 
 // Function to seed roles
 const seedRoles = async () => {
@@ -249,8 +182,8 @@ const seedRoles = async () => {
 // Function to seed users
 const seedUsers = async () => {
     for (const userData of users) {
-        const existingUser  = await User.findOne({ username: userData.username });
-        if (existingUser ) {
+        const existingUser   = await User.findOne({ username: userData.username });
+        if (existingUser  ) {
             console.log(`${userData.username} already exists.`);
             continue;
         }
@@ -264,7 +197,7 @@ const seedUsers = async () => {
             continue;
         }
 
-        const newUser  = new User({
+        const newUser   = new User({
             username: userData.username,
             email: userData.email,
             password: hashedPassword,
@@ -273,8 +206,8 @@ const seedUsers = async () => {
             role: role._id,
         });
 
-        await newUser .save();
-        console.log(`User  '${userData.username}' created successfully.`);
+        await newUser  .save();
+        console.log(`User   '${userData.username}' created successfully.`);
     }
 };
 
@@ -298,93 +231,20 @@ const seedWorkOrders = async () => {
 
 // Function to seed tasks
 const seedTasks = async () => {
-    try {
-        const adminUser   = await User.findOne({ username: 'admin' });
-        if (!adminUser  ) {
-            console.error('Admin user not found. Please ensure the admin user is seeded before tasks.');
-            return;
+    for (const taskData of tasks) {
+        const newTask = new Task(taskData);
+        await newTask.save();
+        console.log(`Task '${taskData.title}' created successfully.`);
+        
+        // If the task is linked to a work order, update the work order's tasks array
+        if (taskData.workOrder) {
+            await WorkOrder.findByIdAndUpdate(
+                taskData.workOrder,
+                { $push: { tasks: newTask._id } },
+                { new: true }
+            );
+            console.log(`Task '${taskData.title}' added to Work Order '${taskData.workOrder}'.`);
         }
-
-        const workOrders = await WorkOrder.find();
-        if (workOrders.length === 0) {
-            console.error('No work orders found. Please ensure work orders are seeded before tasks.');
-            return;
-        }
-
-        const tasks = [
-            {
-                title: "Sharpen Edges",
-                description: "Sharpen the edges of the skis.",
-                status: "completed",
-                user: null,
-                deadline: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-                completedAt: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
-                isOnTime: true,
-                resources: ["Ski Grinder"],
-                createdBy: adminUser  ._id,
-                workOrder: workOrders[0]._id
-            },
-            {
-                title: "Apply Wax",
-                description: "Apply wax to the skis for better glide.",
-                status: "completed",
-                user: null,
-                deadline: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-                completedAt: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
-                isOnTime: true,
-                resources: ["Waxing Station"],
-                createdBy: adminUser  ._id,
-                workOrder: workOrders[0]._id
-            },
-            {
-                title: "Inspect Snowboard",
-                description: "Inspect the snowboard for any damages.",
-                status: "pending",
-                user: null,
-                deadline: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
-                resources: [],
-                createdBy: adminUser  ._id,
-                workOrder: workOrders[1]._id
-            },
-            {
-                title: "Repair Base",
-                description: "Repair the base of the snowboard.",
-                status: "pending",
-                user: null,
-                deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-                resources: ["Base Repair Kit"],
-                createdBy: adminUser  ._id,
-                workOrder: workOrders[1]._id
-            },
-            {
-                title: "Redress Stone for Grinder",
-                description: "Maintenance task to redress the stone for the grinder.",
-                status: "pending",
-                user: null,
-                deadline: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-                resources: ["Grinder Maintenance Kit"],
-                createdBy: adminUser   ._id,
-                workOrder: null
-            }
-        ];
-
-        for (const taskData of tasks) {
-            const newTask = new Task(taskData);
-            await newTask.save();
-            console.log(`Task '${taskData.title}' created successfully.`);
-
-            // If the task is linked to a work order, update the work order's tasks array
-            if (taskData.workOrder) {
-                await WorkOrder.findByIdAndUpdate(
-                    taskData.workOrder,
-                    { $push: { tasks: newTask._id } },
-                    { new: true }
-                );
-                console.log(`Task '${taskData.title}' added to Work Order '${taskData.workOrder}'.`);
-            }
-        }
-    } catch (error) {
-        console.error('Error seeding tasks:', error);
     }
 };
 
@@ -392,17 +252,22 @@ const seedTasks = async () => {
 connectDB();
 
 // Seed roles, users, pricelist, work orders, and tasks
-(async () => {
-    try {
-        await seedRoles();
-        await seedUsers();
-        await seedPricelist();
-        await seedWorkOrders();
-        await seedTasks();
-        console.log('Seeding completed successfully.');
-        process.exit(0);
-    } catch (error) {
+const seedDatabase = async () => {
+    await seedRoles();
+    await seedUsers();
+    await seedPricelist();
+    await seedWorkOrders();
+    await seedTasks();
+    console.log('Database seeding completed.');
+};
+
+// Execute the seeding process
+seedDatabase()
+    .then(() => {
+        console.log('Seeding process finished successfully.');
+        mongoose.connection.close();
+    })
+    .catch((error) => {
         console.error('Error during seeding:', error);
-        process.exit(1);
-    }
-})();
+        mongoose.connection.close();
+    });
