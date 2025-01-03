@@ -1,5 +1,3 @@
-import React from "react";
-
 const WorkOrderList = ({ workOrders, setSelectedOrder }) => {
   return (
     <div className="bg-white shadow-md rounded-lg p-4">

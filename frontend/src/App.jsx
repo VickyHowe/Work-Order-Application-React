@@ -1,3 +1,4 @@
+import './index.css'; 
 import { useState } from "react";
 import Layout from "./components/Layout";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
@@ -17,6 +18,7 @@ import TaskList from "./components/tasks/Tasklist";
 import PricelistManagement from "./components/pricelist/PricelistManagement";
 import CalendarView from "./components/calendar/CalendarView";
 import WorkOrderList from "./components/workOrders/WorkOrderList";
+import ReportsPage from "./components/reports/Reports";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -119,6 +121,15 @@ const App = () => {
               path="/user-management"
               element={
                 <ProtectedRoute element={<UserManagement />} user={user} />
+              }
+            />
+            <Route
+              path="/reports"
+              element={
+                <ProtectedRoute
+                  element={<ReportsPage />}
+                  user={user} 
+                />
               }
             />
           </Routes>

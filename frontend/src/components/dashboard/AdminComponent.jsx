@@ -69,6 +69,20 @@ const AdminComponent = () => {
             </Link>
           </div>
         </div>
+                {/* Card for Reports */}
+                <div className="bg-white rounded-lg shadow-md p-6 w-full h-64 relative overflow-hidden">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${pricelistManagementImage})` }}
+          />
+          <div className="relative z-10 p-4">
+            <Link to="/reports">
+              <button className="bg-secondary-light text-black p-2 mt-8 w-full rounded-md hover:bg-blue-600">
+              Reports
+              </button>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

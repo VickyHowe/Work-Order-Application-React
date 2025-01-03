@@ -65,8 +65,8 @@ const CalendarView = ({ user }) => {
   }, []);
 
   useEffect(() => {
-    console.log("Work Orders:", workOrders); // Log work orders
-    console.log("Tasks:", tasks); // Log tasks
+    console.log("Work Orders:", workOrders); 
+    console.log("Tasks:", tasks);
   }, [workOrders, tasks]);
 
   workOrders.forEach((order) => {
@@ -93,22 +93,22 @@ const CalendarView = ({ user }) => {
       ...workOrders.map((order) => ({
         _id: order._id,
         title: order.title,
-        start: new Date(order.createdAt), // Use createdAt as the start date
-        end: new Date(order.deadline),   // Use deadline as the end date
+        start: new Date(order.deadline), 
+        end: new Date(order.deadline),   
         allDay: true,
-        type: "workOrder", // Explicitly set the type for work orders
+        type: "workOrder", 
       })),
       ...tasks.map((task) => ({
         _id: task._id,
         title: task.title,
-        start: new Date(task.createdAt), // Use createdAt as the start date
-        end: new Date(task.deadline),   // Use deadline as the end date
+        start: new Date(task.deadline), 
+        end: new Date(task.deadline),   
         allDay: true,
-        type: "task", // Explicitly set the type for tasks
+        type: "task", 
       })),
     ];
     console.log("Combined Events:", combinedEvents);
-    setEvents(combinedEvents); // Update events here
+    setEvents(combinedEvents); 
   }, [workOrders, tasks]);
 
   // Customize event colors
@@ -126,6 +126,7 @@ const CalendarView = ({ user }) => {
   const handleSelectEvent = (event) => {
     const order = workOrders.find((e) => e._id === event._id);
     if (order) {
+      console.log("Selected Order from Calendar:", order);
       setSelectedOrder(order);
       setShowWorkOrderList(true);
     }

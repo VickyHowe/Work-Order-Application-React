@@ -53,16 +53,33 @@ exports.updateTask = async (req, res, next) => {
             return next(new AppError('User not found', 404));
         }
 
-        // Update the task with the user ID and status
-        const updatedTask = await Task.findByIdAndUpdate(req.params.id, {
-            title,
-            description,
-            deadline,
-            resources,
-            user: user._id,
-            status 
-        }, { new: true })
-        .populate('user', 'username role _id');
+        // Fetch the task to check the current status
+        const task = await Task.findById(req.params.id);
+        if (!task) {
+            return next(new AppError('Task not found', 404));
+        }
+
+        // If the task is being marked as completed, set completedAt and isOnTime
+        if (status === 'completed') {
+            task.completedAt = new Date(); 
+            task.isOnTime = task.completedAt <= task.deadline; 
+        }
+
+        // Update the task with the new data
+        const updatedTask = await Task.findByIdAndUpdate(
+            req.params.id,
+            {
+                title,
+                description,
+                deadline,
+                resources,
+                user: user._id,
+                status,
+                completedAt: task.completedAt, 
+                isOnTime: task.isOnTime 
+            },
+            { new: true }
+        ).populate('user', 'username role _id');
 
         if (!updatedTask) {
             return next(new AppError('Task not found', 404));

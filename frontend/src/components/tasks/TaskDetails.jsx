@@ -1,5 +1,3 @@
-import React from "react";
-
 const TaskDetails = ({ task, onClose }) => {
   if (!task) return null;
 

@@ -63,22 +63,37 @@ exports.updateWorkOrder = async (req, res) => {
     const { id } = req.params;
     const { status, internalComments, priority, reminders, predefinedServices, attachments } = req.body;
 
-    const updateData = {
-        status,
-        priority,
-        reminders,
-        predefinedServices,
-        attachments,
-    };
-
-    if (Array.isArray(internalComments)) {
-        updateData.$push = { internalComments: { $each: internalComments } };
-    }
-
     try {
-        const workOrder = await WorkOrder.findByIdAndUpdate(id, updateData, { new: true });
-        if (!workOrder) return res.status(404).json({ message: 'Work order not found' });
-        res.status(200).json({ message: 'WorkOrder edited successfully', workOrder });
+        // Fetch the work order to check the current status
+        const workOrder = await WorkOrder.findById(id);
+        if (!workOrder) {
+            return res.status(404).json({ message: 'Work order not found' });
+        }
+
+        // If the work order is being marked as completed, set completedAt and isOnTime
+        if (status === 'completed') {
+            workOrder.completedAt = new Date(); // Set the completion timestamp
+            workOrder.isOnTime = workOrder.completedAt <= workOrder.deadline; // Check if completed on time
+        }
+
+        // Prepare the update data
+        const updateData = {
+            status,
+            priority,
+            reminders,
+            predefinedServices,
+            attachments,
+            completedAt: workOrder.completedAt, 
+            isOnTime: workOrder.isOnTime 
+        };
+
+        if (Array.isArray(internalComments)) {
+            updateData.$push = { internalComments: { $each: internalComments } };
+        }
+
+        // Update the work order
+        const updatedWorkOrder = await WorkOrder.findByIdAndUpdate(id, updateData, { new: true });
+        res.status(200).json({ message: 'WorkOrder edited successfully', workOrder: updatedWorkOrder });
     } catch (error) {
         res.status(500).json({ message: 'Error updating work order', error: error.message });
     }
