@@ -5,6 +5,7 @@ const AppError = require('../utils/AppError');
 // Create a new work order request from a customer
 exports.createWorkOrderRequest = async (req, res) => {
     const { title, description, customerComments, priority, reminders, predefinedServices, attachments } = req.body;
+    console.log("Request body:", req.body);
     try {
         const workOrder = await WorkOrder.create({
             title,
@@ -20,7 +21,7 @@ exports.createWorkOrderRequest = async (req, res) => {
         });
         res.status(201).json({message: 'WorkOrder created sucessfully!', workOrder});
     } catch (error) {
-        res.status(500).json({ message: 'Error creating work order request', error: error.message });
+        return next(new AppError('Error creating work order request', 500));
     }
 };
 
@@ -41,16 +42,11 @@ exports.createTaskForWorkOrder = async (req, res, next) => {
             status: status || 'pending'
         });
 
-        console.log("New Task Created:", newTask); 
-
         const updatedWorkOrder = await WorkOrder.findByIdAndUpdate(
             workOrderId,
             { $push: { tasks: newTask._id } },
             { new: true } 
         );
-
-        console.log("Updated Work Order:", updatedWorkOrder); 
-
         res.status(201).json(newTask);
     } catch (error) {
         console.error(error); 
@@ -64,16 +60,16 @@ exports.updateWorkOrder = async (req, res) => {
     const { status, internalComments, priority, reminders, predefinedServices, attachments } = req.body;
 
     try {
-        // Fetch the work order to check the current status
+        // Fetch and check the current status
         const workOrder = await WorkOrder.findById(id);
         if (!workOrder) {
-            return res.status(404).json({ message: 'Work order not found' });
+            return next(new AppError('Work order not found', 404));
         }
 
-        // If the work order is being marked as completed, set completedAt and isOnTime
+        // Set onTime?
         if (status === 'completed') {
-            workOrder.completedAt = new Date(); // Set the completion timestamp
-            workOrder.isOnTime = workOrder.completedAt <= workOrder.deadline; // Check if completed on time
+            workOrder.completedAt = new Date(); 
+            workOrder.isOnTime = workOrder.completedAt <= workOrder.deadline; 
         }
 
         // Prepare the update data
@@ -95,7 +91,7 @@ exports.updateWorkOrder = async (req, res) => {
         const updatedWorkOrder = await WorkOrder.findByIdAndUpdate(id, updateData, { new: true });
         res.status(200).json({ message: 'WorkOrder edited successfully', workOrder: updatedWorkOrder });
     } catch (error) {
-        res.status(500).json({ message: 'Error updating work order', error: error.message });
+        return next(new AppError('Error updating work order', 500));
     }
 };
 
@@ -104,10 +100,11 @@ exports.deleteWorkOrder = async (req, res) => {
     const { id } = req.params;
     try {
         const deletedWorkOrder = await WorkOrder.findByIdAndDelete(id);
-        if (!deletedWorkOrder) return res.status(404).json({ message: 'Work order not found' });
+        if (!deletedWorkOrder) 
+            return next(new AppError('Work order not found', 404));
         res.status(200).json({message: 'Work Order was sucessfully Deleted!'}); 
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting work order', error: error.message });
+        return next(new AppError('Error deleting work order', 500));
     }
 };
 
@@ -134,7 +131,7 @@ exports.getAllWorkOrdersForManager = async (req, res) => {
             .populate('createdBy', 'username'); 
         res.status(200).json(workOrders);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching work orders', error: error.message });
+        return next(new AppError('Error fetching work orders', 500));
     }
 };
 
@@ -146,6 +143,6 @@ exports.getWorkOrdersForUser  = async (req, res) => {
             .populate('createdBy', 'username');
         res.status(200).json(workOrders);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching work orders', error: error.message });
+        return next(new AppError('Error fetching work orders', 500));
     }
 };

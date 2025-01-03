@@ -15,34 +15,47 @@ const roles = [
         name: 'admin',
         canAssign: ['*'],
         permissions: [
-            { resource: '*', action: '*' }
+            { resource: '*', action: '*' } 
         ]
     },
     {
         name: 'manager',
         canAssign: ['employee', 'customer'],
         permissions: [
-            { resource: 'tasks', action: 'manage' },
+            { resource: 'tasks', action: 'manage' }, 
             { resource: 'roles', action: 'view' },
-            { resource: 'roles', action: 'assign' },
-            { resource: 'profile', action: 'view' },
-            { resource: 'profile', action: 'update' }
+            { resource: 'roles', action: 'assign' }, 
+            { resource: 'profile', action: 'view' }, 
+            { resource: 'profile', action: 'update' }, 
+            { resource: 'pricelist', action: 'create' }, 
+            { resource: 'pricelist', action: 'view' }, 
+            { resource: 'pricelist', action: 'update' }, 
+            { resource: 'pricelist', action: 'delete' }, 
+            { resource: 'workorder', action: 'create' }, 
+            { resource: 'workorder', action: 'view' }, 
+            { resource: 'workorder', action: 'update' }, 
+            { resource: 'workorder', action: 'delete' }, 
+            { resource: 'report', action: 'view' } 
         ]
     },
     {
         name: 'employee',
         canAssign: [],
         permissions: [
-            { resource: 'tasks', action: 'view' },
-            { resource: 'profile', action: 'update' }
+            { resource: 'tasks', action: 'view' }, 
+            { resource: 'profile', action: 'update' }, 
+            { resource: 'workorder', action: 'view' }, 
+            { resource: 'report', action: 'view' } 
         ]
     },
     {
         name: 'customer',
         canAssign: [],
         permissions: [
-            { resource: 'pricelists', action: 'view' },
-            { resource: 'profile', action: 'update' }
+            { resource: 'pricelists', action: 'view' }, 
+            { resource: 'profile', action: 'update' }, 
+            { resource: 'workorder', action: 'create' }, 
+            { resource: 'workorder', action: 'view' } 
         ]
     },
 ];
@@ -89,19 +102,19 @@ const pricelistItems = [
         itemName: "Edge Sharpening",
         price: 20,
         description: "Sharpen the edges of skis or snowboards.",
-        createdBy: null // Will be assigned to the manager
+        createdBy: null 
     },
     {
         itemName: "Waxing",
         price: 15,
         description: "Apply wax to skis or snowboards for better glide.",
-        createdBy: null // Will be assigned to the manager
+        createdBy: null 
     },
     {
         itemName: "Base Repair",
         price: 50,
         description: "Repair cracks or damage to the base of skis or snowboards.",
-        createdBy: null // Will be assigned to the manager
+        createdBy: null 
     }
 ];
 
@@ -124,19 +137,19 @@ const generateWorkOrdersAndTasks = (numWorkOrders, numTasks) => {
             title: `Work Order ${i + 1}`,
             description: `Description for work order ${i + 1}.`,
             status: status,
-            assignedTo: null, // Will be assigned to an employee
-            createdBy: null, // Will be assigned to a customer
+            assignedTo: null, 
+            createdBy: null, 
             deadline: generateRandomDate(new Date(), new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)), // Random deadline within a year
  completedAt: status === "completed" ? generateRandomDate(new Date(), new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)) : null,
-            isOnTime: status === "completed" ? Math.random() > 0.5 : null, // Randomly assign on-time status
+            isOnTime: status === "completed" ? Math.random() > 0.5 : null, 
             priority: ["low", "medium", "high"][Math.floor(Math.random() * 3)],
             predefinedServices: [services[Math.floor(Math.random() * services.length)]],
             customerComments: [],
             internalComments: [],
             attachments: [],
             resources: [],
-            tasks: [] // Will be populated with tasks
-        };
+            tasks: [] 
+            };
         workOrders.push(workOrder);
     }
 
@@ -147,13 +160,13 @@ const generateWorkOrdersAndTasks = (numWorkOrders, numTasks) => {
             title: `Task ${i + 1}`,
             description: `Description for task ${i + 1}.`,
             status: status,
-            user: null, // Will be assigned to an employee
+            user: null,
             deadline: generateRandomDate(new Date(), new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)), // Random deadline within a year
             completedAt: status === "completed" ? generateRandomDate(new Date(), new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)) : null,
             isOnTime: status === "completed" ? Math.random() > 0.5 : null,
             resources: [],
-            createdBy: null, // Will be assigned to a user
-            workOrder: null // Will be linked to a work order
+            createdBy: null,
+            workOrder: null 
         };
         tasks.push(task);
     }

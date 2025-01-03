@@ -9,8 +9,10 @@ const getReportData = async (req, res) => {
     // Work Order Metrics
     const workOrdersByStatus = {
       pending: workOrders.filter((order) => order.status === "pending").length,
-      inProgress: workOrders.filter((order) => order.status === "in-progress").length,
-      completed: workOrders.filter((order) => order.status === "completed").length,
+      inProgress: workOrders.filter((order) => order.status === "in-progress")
+        .length,
+      completed: workOrders.filter((order) => order.status === "completed")
+        .length,
     };
 
     const workOrdersByPriority = {
@@ -33,10 +35,12 @@ const getReportData = async (req, res) => {
         ? totalTime / completedWorkOrders.length
         : 0;
 
-    const workOrdersByUser  = {};
+    const workOrdersByUser = {};
     workOrders.forEach((order) => {
-      const userId = order.assignedTo ? order.assignedTo.toString() : "Unassigned";
-      workOrdersByUser [userId] = (workOrdersByUser [userId] || 0) + 1;
+      const userId = order.assignedTo
+        ? order.assignedTo.toString()
+        : "Unassigned";
+      workOrdersByUser[userId] = (workOrdersByUser[userId] || 0) + 1;
     });
 
     // Task Metrics
@@ -55,10 +59,10 @@ const getReportData = async (req, res) => {
     const averageTimeToCompleteTasks =
       completedTasks.length > 0 ? totalTaskTime / completedTasks.length : 0;
 
-    const tasksByUser  = {};
+    const tasksByUser = {};
     tasks.forEach((task) => {
       const userId = task.user ? task.user.toString() : "Unassigned";
-      tasksByUser [userId] = (tasksByUser [userId] || 0) + 1;
+      tasksByUser[userId] = (tasksByUser[userId] || 0) + 1;
     });
 
     // Combined Metrics
@@ -87,13 +91,15 @@ const getReportData = async (req, res) => {
     const totalWorkOrders = workOrders.length;
     const totalTasks = tasks.length;
 
-    const completedWorkOrdersPercentage = totalWorkOrders > 0
-      ? (completedWorkOrders.length / totalWorkOrders * 100).toFixed(2)
-      : 0;
+    const completedWorkOrdersPercentage =
+      totalWorkOrders > 0
+        ? ((completedWorkOrders.length / totalWorkOrders) * 100).toFixed(2)
+        : 0;
 
-    const completedTasksPercentage = totalTasks > 0
-      ? (completedTasks.length / totalTasks * 100).toFixed(2)
-      : 0;
+    const completedTasksPercentage =
+      totalTasks > 0
+        ? ((completedTasks.length / totalTasks) * 100).toFixed(2)
+        : 0;
 
     // Report Data
     const reportData = {
@@ -104,10 +110,10 @@ const getReportData = async (req, res) => {
       workOrdersByStatus,
       workOrdersByPriority,
       averageTimeToComplete,
-      workOrdersByUser ,
+      workOrdersByUser,
       tasksByStatus,
       averageTimeToCompleteTasks,
-      tasksByUser ,
+      tasksByUser,
       totalResources,
       totalCustomerComments,
       totalInternalComments,

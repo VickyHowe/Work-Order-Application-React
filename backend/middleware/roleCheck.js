@@ -1,7 +1,7 @@
 const roleCheck = (allowedRoles, action) => {
     return (req, res, next) => {
-        const userRole = req.user.role; // Assuming req.user is populated with the authenticated user's data
-        const userId = req.params.id; // Get the user ID from the request parameters
+        const userRole = req.user.role; 
+        const userId = req.params.id; 
         console.log("Authenticated user:", req.user);
 
         // Check if userRole is defined and has canAssign and permissions properties
@@ -16,17 +16,12 @@ const roleCheck = (allowedRoles, action) => {
                 .json({ message: "You do not have permission to perform this action" });
         }
 
-        // Log allowed roles
-        console.log("Allowed Roles:", allowedRoles);
-
         // Check if the user's role can perform the action
         const hasRolePermission = allowedRoles.includes(userRole.name) || userRole.canAssign.includes("*");
 
-        console.log("Has Role Permission:", hasRolePermission); // Log role permission check result
-
         // Allow admin to bypass role permission checks
         if (userRole.name === 'admin') {
-            return next(); // Admins can perform any action
+            return next(); 
         }
 
         if (!hasRolePermission) {
@@ -48,11 +43,14 @@ const roleCheck = (allowedRoles, action) => {
         // Check for specific action permissions
         const hasActionPermission = userRole.permissions.some(
             (permission) =>
-                (permission.resource === "roles" && permission.action === action) || // Check for roles and the specific action
-                (permission.resource === "*" && permission.action === "*") // Allow all actions on all resources for admin
+                (permission.resource === 'workorder' && permission.action === action) || 
+                (permission.resource === 'tasks' && permission.action === action) || 
+                (permission.resource === 'pricelist' && permission.action === action) || 
+                (permission.resource === 'report' && permission.action === action) || 
+                (permission.resource === "*" && permission.action === "*") 
         );
 
-        console.log("Has Action Permission:", hasActionPermission); // Log action permission check result
+        console.log("Has Action Permission:", hasActionPermission); 
 
         if (!hasActionPermission) {
             return res
