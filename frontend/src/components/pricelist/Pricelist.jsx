@@ -1,83 +1,77 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import useApi from "../../hooks/useApi";
 
-const Pricelist = () => {
-    const [pricelists, setPricelists] = useState([]);
-    const [selectedService, setSelectedService] = useState('');
-    const [desiredTimeline, setDesiredTimeline] = useState('');
-    const [error, setError] = useState('');
+const Pricelist = ({ user }) => {
+  const { apiCall } = useApi();
+  const [pricelists, setPricelists] = useState([]);
+  const [loadingPricelists, setLoadingPricelists] = useState(true);
+  const [errorPricelists, setErrorPricelists] = useState(null);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchPricelists = async () => {
-            try {
-                // Removed the unused response variable
-                await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/pricelist`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
-                }).then(response => {
-                    setPricelists(response.data);
-                });
-            } catch {
-                setError('Error fetching pricelist'); // Removed the unused err variable
-            }
-        };
-
-        fetchPricelists();
-    }, []);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            // Removed the unused response variable
-            await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/tasks`, {
-                title: selectedService,
-                description: `Requested service: ${selectedService}`,
-                deadline: desiredTimeline,
-                resources: [], // You can add resources if needed
-            }, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-            alert('Service request submitted successfully!');
-            // Reset the form
-            setSelectedService('');
-            setDesiredTimeline('');
-        } catch {
-            setError('Error submitting service request'); // Removed the unused err variable
-        }
+  useEffect(() => {
+    const fetchPricelists = async () => {
+      setLoadingPricelists(true);
+      try {
+        const response = await apiCall("/api/pricelist", "get", {
+          headers: {
+            Authorization: user ? `Bearer ${localStorage.getItem("token")}` : undefined,
+          },
+        });
+        setPricelists(response);
+      } catch (error) {
+        setErrorPricelists("Error fetching pricelists");
+        console.error("Error fetching pricelists:", error.response ? error.response.data : error);
+      } finally {
+        setLoadingPricelists(false);
+      }
     };
 
-    return (
-        <div>
-            <h2>Available Services</h2>
-            {error && <p className="text-red-500">{error}</p>}
-            <ul>
-                {pricelists.map(item => (
-                    <li key={item._id}>
-                        <h3>{item.itemName}</h3>
-                        <p>Price: ${item.price}</p>
-                        <p>{item.description}</p>
-                        <button onClick={() => setSelectedService(item.itemName)}>Select</button>
-                    </li>
-                ))}
-            </ul>
-            {selectedService && (
-                <form onSubmit={handleSubmit} className="mt-4">
-                    <h3>Request Service: {selectedService}</h3>
-                    <input
-                        type="date"
-                        value={desiredTimeline}
-                        onChange={(e) => setDesiredTimeline(e.target.value)}
-                        required
-                        className="border p-2 mb-2 w-full"
-                    />
-                    <button type="submit" className="bg-blue-500 text-white p-2 rounded">Submit Request</button>
-                </form>
-            )}
-        </div>
-    );
+    fetchPricelists();
+  }, [apiCall, user]);
+
+  const handleRequestService = () => {
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      navigate("/login");
+    }
+  };
+
+  return (
+    <div>
+      <h4>Book your service today!</h4>
+      <div>
+        <button className="btn btn-primary" onClick={handleRequestService}>
+          Request Service
+        </button>
+      </div>
+      <p>
+        All work will be scheduled upon equipment dropoff. Final billing will
+        take place upon equipment pickup.
+      </p>
+      {/* Display available services */}
+      <div className="row pt-2">
+        {loadingPricelists ? (
+          <p>Loading services...</p>
+        ) : errorPricelists ? (
+          <p className="text-danger">{errorPricelists}</p>
+        ) : (
+          pricelists.map((item) => (
+            <div className="col-md-4" key={item._id}>
+              <div className="card mb-4">
+                <div className="card-body">
+                  <h5 className="card-title">{item.itemName}</h5>
+                  <p className="card-text">Price: ${item.price}</p>
+                  <p className="card-text">{item.description}</p>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default Pricelist;

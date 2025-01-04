@@ -166,6 +166,12 @@ const TaskList = ({ user }) => {
   return (
     <div className="mx-auto mt-10 p-6 bg-forms text-black border-gray rounded-lg shadow-md w-full sm:max-w-md md:max-w-lg lg:max-w-4xl">
       <h2 className="text-xl font-bold mb-4">Task List</h2>
+      <button
+        onClick={() => setShowModal(true)}
+        className="bg-green-500 text-white p-2 rounded mt-4"
+      >
+        Add Task
+      </button>
       {loading && <p>Loading tasks...</p>}
       {error && <p>{error}</p>}
       <input
@@ -332,13 +338,6 @@ const TaskList = ({ user }) => {
           </tbody>
         </table>
       </div>
-
-      <button
-        onClick={() => setShowModal(true)}
-        className="bg-green-500 text-white p-2 rounded mt-4"
-      >
-        Add Task
-      </button>
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton className="bg-forms text-black">
           <Modal.Title>{selectedTask ? "Edit Task" : "Add Task"}</Modal.Title>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
-import axios from 'axios';
+import useApi from '../../hooks/useApi'; // Import the useApi hook
 import AdminComponent from '../dashboard/AdminComponent';
 import ManagerComponent from '../dashboard/ManagerComponent';
 import EmployeeComponent from '../dashboard/EmployeeComponent';
@@ -9,8 +8,8 @@ import CustomerComponent from '../dashboard/CustomerComponent';
 
 const Dashboard = ({ onLogout }) => {
     const navigate = useNavigate();
+    const { apiCall, loading, error } = useApi(); // Use the useApi hook
     const [userData, setUserData] = useState(null);
-    const [loading, setLoading] = useState(true);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -21,26 +20,24 @@ const Dashboard = ({ onLogout }) => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users/profile`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
-                });
-                setUserData(response.data);
+                const response = await apiCall("/api/users/profile", "get");
+                setUserData(response);
                 console.log(response);
             } catch (error) {
                 console.error('Error fetching user data:', error);
                 navigate('/login');
-            } finally {
-                setLoading(false);
             }
         };
 
         fetchUserData();
-    }, [navigate]);
+    }, [apiCall, navigate]);
 
     if (loading) {
         return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>{error}</div>; 
     }
 
     if (!userData) {
@@ -50,13 +47,13 @@ const Dashboard = ({ onLogout }) => {
     const renderRoleBasedComponent = () => {
         switch (userData.role.name) {
             case 'admin':
-                return <AdminComponent />;
+                return <AdminComponent userRole={userData.role.name}/>;
             case 'manager':
-                return <ManagerComponent />;
+                return <ManagerComponent userRole={userData.role.name}/>;
             case 'employee':
-                return <EmployeeComponent />;
+                return <EmployeeComponent userRole={userData.role.name}/>;
             case 'customer':
-                return <CustomerComponent />;
+                return <CustomerComponent userRole={userData.role.name} />; 
             default:
                 return <div>Unauthorized role</div>;
         }

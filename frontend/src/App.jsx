@@ -1,4 +1,4 @@
-import './index.css'; 
+import "./index.css";
 import { useState } from "react";
 import Layout from "./components/Layout";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
@@ -16,6 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import UserManagement from "./components/user/UserManagement";
 import TaskList from "./components/tasks/Tasklist";
 import PricelistManagement from "./components/pricelist/PricelistManagement";
+import Pricelist from "./components/pricelist/Pricelist";
 import CalendarView from "./components/calendar/CalendarView";
 import WorkOrderList from "./components/workOrders/WorkOrderList";
 import ReportsPage from "./components/reports/Reports";
@@ -105,17 +106,8 @@ const App = () => {
                   onLogout={handleLogout}
                 />
               }
-            />
-            <Route
-              path="/pricelist"
-              element={
-                <ProtectedRoute
-                  element={<PricelistManagement />}
-                  user={user}
-                  onLogout={handleLogout}
-                />
-              }
             />{" "}
+            <Route path="/pricelist" element={<Pricelist user={user} />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route
               path="/user-management"
@@ -125,13 +117,8 @@ const App = () => {
             />
             <Route
               path="/reports"
-              element={
-                <ProtectedRoute
-                  element={<ReportsPage />}
-                  user={user} 
-                />
-              }
-            />
+              element={<ProtectedRoute element={<ReportsPage />} user={user} />}
+            />{" "}
           </Routes>
         </div>
       </Layout>

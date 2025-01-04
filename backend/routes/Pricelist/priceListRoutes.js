@@ -5,12 +5,17 @@ const pricelistController = require("../../controllers/pricelistController");
 
 const router = express.Router();
 
+//Public Pricelist Route
+router
+  .route("/")
+  .get(pricelistController.getAllPricelists) 
+
+
 router.use(authMiddleware);
 
 // Pricelist routes
 router
   .route("/")
-  .get(pricelistController.getAllPricelists)
   .post(
     roleCheck(["manager", "admin"], "create"),
     pricelistController.createPricelist
