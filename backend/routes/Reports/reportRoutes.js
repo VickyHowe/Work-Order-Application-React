@@ -8,7 +8,7 @@ const roleCheck = require("../../middleware/roleCheck");
 router.get(
   "/",
   authMiddleware,
-  roleCheck(["admin", "manager"], "read"),
+  roleCheck(["admin", "manager"], "view"),
   getReportData
 );
 

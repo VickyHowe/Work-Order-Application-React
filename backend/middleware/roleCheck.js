@@ -1,6 +1,9 @@
 const roleCheck = (allowedRoles, action) => {
     return (req, res, next) => {
         const userRole = req.user.role; 
+        console.log("Authenticated user:", req.user);
+        console.log("Checking permissions for action:", action);
+
         const userId = req.params.id; 
         console.log("Authenticated user:", req.user);
 

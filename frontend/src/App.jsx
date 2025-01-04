@@ -54,6 +54,7 @@ const App = () => {
                 <ProtectedRoute
                   element={<RequestPasswordReset />}
                   user={user}
+                  onLogout={handleLogout}
                 />
               }
             />
@@ -101,7 +102,7 @@ const App = () => {
               path="/pricelist-management"
               element={
                 <ProtectedRoute
-                  element={<PricelistManagement />}
+                  element={<PricelistManagement user={user} />}
                   user={user}
                   onLogout={handleLogout}
                 />
@@ -112,12 +113,22 @@ const App = () => {
             <Route
               path="/user-management"
               element={
-                <ProtectedRoute element={<UserManagement />} user={user} />
+                <ProtectedRoute
+                  element={<UserManagement />}
+                  user={user}
+                  onLogout={handleLogout}
+                />
               }
             />
             <Route
               path="/reports"
-              element={<ProtectedRoute element={<ReportsPage />} user={user} />}
+              element={
+                <ProtectedRoute
+                  element={<ReportsPage />}
+                  user={user}
+                  onLogout={handleLogout}
+                />
+              }
             />{" "}
           </Routes>
         </div>

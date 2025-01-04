@@ -29,8 +29,8 @@ const useReports = () => {
     averageTimeToComplete: 0,
     averageTimeToCompleteTasks: 0,
     onTimeCompletionMetrics: {
-      tasks: [], // Default empty array for tasks
-      workOrders: [] // Default empty array for work orders
+      tasks: [], 
+      workOrders: [] 
     }
   };
 
