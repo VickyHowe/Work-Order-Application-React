@@ -286,7 +286,6 @@ exports.getUserById = async (req, res) => {
 };
 // Get All Users
 exports.getAllUsers = async (req, res) => {
-  console.log("I am getting all users");
   try {
     const users = await User.find()
       .select("-password -securityQuestion -securityQuestionAnswer")
@@ -299,11 +298,10 @@ exports.getAllUsers = async (req, res) => {
 
     const formattedUsers = await Promise.all(
       users.map(async (user) => {
-        console.log("Processing user:", user);
+
 
         const userProfile = await UserProfile.findOne({ user: user._id });
         if (!userProfile) {
-          console.warn("User  profile not found for user:", user._id);
           return {
             _id: user._id,
             username: user.username,

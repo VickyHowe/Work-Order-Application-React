@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 const Role = require('../models/Role');
 const UserProfile = require('../models/UserProfile');
+const WorkOrder = require('../models/WorkOrder');
+const Task = require('../models/Task');
+const Pricelist = require('../models/Pricelist');
 const bcrypt = require('bcryptjs');
 const connectDB = require('../config/db');
 
@@ -12,34 +15,47 @@ const roles = [
         name: 'admin',
         canAssign: ['*'],
         permissions: [
-            { resource: '*', action: '*' }
+            { resource: '*', action: '*' } 
         ]
     },
     {
         name: 'manager',
         canAssign: ['employee', 'customer'],
         permissions: [
-            { resource: 'tasks', action: 'manage' },
+            { resource: 'tasks', action: 'manage' }, 
             { resource: 'roles', action: 'view' },
-            { resource: 'roles', action: 'assign' },
-            { resource: 'profile', action: 'view' },
-            { resource: 'profile', action: 'update' }
+            { resource: 'roles', action: 'assign' }, 
+            { resource: 'profile', action: 'view' }, 
+            { resource: 'profile', action: 'update' }, 
+            { resource: 'pricelist', action: 'create' }, 
+            { resource: 'pricelist', action: 'view' }, 
+            { resource: 'pricelist', action: 'update' }, 
+            { resource: 'pricelist', action: 'delete' }, 
+            { resource: 'workorder', action: 'create' }, 
+            { resource: 'workorder', action: 'view' }, 
+            { resource: 'workorder', action: 'update' }, 
+            { resource: 'workorder', action: 'delete' }, 
+            { resource: 'report', action: 'view' } 
         ]
     },
     {
         name: 'employee',
         canAssign: [],
         permissions: [
-            { resource: 'tasks', action: 'view' },
-            { resource: 'profile', action: 'update' }
+            { resource: 'tasks', action: 'view' }, 
+            { resource: 'profile', action: 'update' }, 
+            { resource: 'workorder', action: 'view' }, 
+            { resource: 'report', action: 'view' } 
         ]
     },
     {
         name: 'customer',
         canAssign: [],
         permissions: [
-            { resource: 'pricelists', action: 'view' },
-            { resource: 'profile', action: 'update' }
+            { resource: 'pricelists', action: 'view' }, 
+            { resource: 'profile', action: 'update' }, 
+            { resource: 'workorder', action: 'create' }, 
+            { resource: 'workorder', action: 'view' } 
         ]
     },
 ];
@@ -52,7 +68,7 @@ const users = [
         password: 'admin123',
         securityQuestion: "What is your mother's maiden name?",
         securityQuestionAnswer: "Smith",
-        role: 'admin' // This should match the role name in the roles collection
+        role: 'admin'
     },
     {
         username: 'manager',
@@ -80,6 +96,87 @@ const users = [
     }
 ];
 
+// Define pricelist items
+const pricelistItems = [
+    {
+        itemName: "Edge Sharpening",
+        price: 20,
+        description: "Sharpen the edges of skis or snowboards.",
+        createdBy: null 
+    },
+    {
+        itemName: "Waxing",
+        price: 15,
+        description: "Apply wax to skis or snowboards for better glide.",
+        createdBy: null 
+    },
+    {
+        itemName: "Base Repair",
+        price: 50,
+        description: "Repair cracks or damage to the base of skis or snowboards.",
+        createdBy: null 
+    }
+];
+
+// Function to generate random date within a year
+const generateRandomDate = (startDate, endDate) => {
+    return new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
+};
+
+// Function to generate work orders and tasks
+const generateWorkOrdersAndTasks = (numWorkOrders, numTasks) => {
+    const workOrders = [];
+    const tasks = [];
+    const services = ["Edge Sharpening", "Waxing", "Base Repair", "Ski Tune-Up", "Snowboard Repair"];
+    const statuses = ["completed", "in-progress", "pending"];
+
+    // Generate work orders
+    for (let i = 0; i < numWorkOrders; i++) {
+        const status = statuses[Math.floor(Math.random() * statuses.length)];
+        const workOrder = {
+            title: `Work Order ${i + 1}`,
+            description: `Description for work order ${i + 1}.`,
+            status: status,
+            assignedTo: null, 
+            createdBy: null, 
+            deadline: generateRandomDate(new Date(), new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)), // Random deadline within a year
+ completedAt: status === "completed" ? generateRandomDate(new Date(), new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)) : null,
+            isOnTime: status === "completed" ? Math.random() > 0.5 : null, 
+            priority: ["low", "medium", "high"][Math.floor(Math.random() * 3)],
+            predefinedServices: [services[Math.floor(Math.random() * services.length)]],
+            customerComments: [],
+            internalComments: [],
+            attachments: [],
+            resources: [],
+            tasks: [] 
+            };
+        workOrders.push(workOrder);
+    }
+
+    // Generate tasks
+    for (let i = 0; i < numTasks; i++) {
+        const status = statuses[Math.floor(Math.random() * statuses.length)];
+        const task = {
+            title: `Task ${i + 1}`,
+            description: `Description for task ${i + 1}.`,
+            status: status,
+            user: null,
+            deadline: generateRandomDate(new Date(), new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)), // Random deadline within a year
+            completedAt: status === "completed" ? generateRandomDate(new Date(), new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)) : null,
+            isOnTime: status === "completed" ? Math.random() > 0.5 : null,
+            resources: [],
+            createdBy: null,
+            workOrder: null 
+        };
+        tasks.push(task);
+    }
+
+    return { workOrders, tasks };
+};
+
+// Generate work orders and tasks
+const { workOrders, tasks } = generateWorkOrdersAndTasks(50, 100); // 50 work orders and 100 tasks
+
 // Function to seed roles
 const seedRoles = async () => {
     for (const roleData of roles) {
@@ -98,8 +195,8 @@ const seedRoles = async () => {
 // Function to seed users
 const seedUsers = async () => {
     for (const userData of users) {
-        const existingUser    = await User .findOne({ username: userData.username });
-        if (existingUser   ) {
+        const existingUser   = await User.findOne({ username: userData.username });
+        if (existingUser  ) {
             console.log(`${userData.username} already exists.`);
             continue;
         }
@@ -107,14 +204,13 @@ const seedUsers = async () => {
         const hashedPassword = await bcrypt.hash(userData.password, 10);
         const hashedSecurityQuestionAnswer = await bcrypt.hash(userData.securityQuestionAnswer, 10);
 
-        // Find the role by name
         const role = await Role.findOne({ name: userData.role });
         if (!role) {
             console.error(`Role '${userData.role}' not found for user ${userData.username}. Please ensure roles are seeded before users.`);
-            continue; // Skip this user if the role does not exist
+            continue;
         }
 
-        const newUser    = new User ({
+        const newUser   = new User({
             username: userData.username,
             email: userData.email,
             password: hashedPassword,
@@ -123,48 +219,68 @@ const seedUsers = async () => {
             role: role._id,
         });
 
-        // Save the user
         await newUser  .save();
         console.log(`User   '${userData.username}' created successfully.`);
+    }
+};
 
-        // Create a user profile
-        const userProfile = new UserProfile({
-            user: newUser  ._id,
-            firstName: 'John',
-            lastName: 'Doe',
-            email: 'john.doe@example.com',
-            phone: '123-456-7890',
-            address: '123 Main St',
-            city: 'Anytown',
-            state: 'Anystate',
- postalCode: 't1t1t1',
-            country: 'USA',
-            avatar: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUTExMVFRUXGBcZGBgXFRcVFRUVFxUYFxYVFRUYHSggGBolGxcVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OGxAQGy0lHyUtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAKgBLAMBIgACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAACAwABBAUGB//EADwQAAEDAgQDBgYHBwUAAAAEAAhEDIRIQVFhEyIyQlJxgTKSFBUQktHwMzUqGx0QgTlJT8FJSYnL/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8A+4f/Z',
-        });
+// Function to seed pricelist items
+const seedPricelist = async () => {
+    for (const itemData of pricelistItems) {
+        const newItem = new Pricelist(itemData);
+        await newItem.save();
+        console.log(`Pricelist item '${itemData.itemName}' created successfully.`);
+    }
+};
 
-        // Save the user profile
-        await userProfile.save();
-        console.log(`User  profile for '${userData.username}' created successfully.`);
+// Function to seed work orders
+const seedWorkOrders = async () => {
+    for (const workOrderData of workOrders) {
+        const newWorkOrder = new WorkOrder(workOrderData);
+        await newWorkOrder.save();
+        console.log(`Work Order '${workOrderData.title}' created successfully.`);
+    }
+};
 
-        // Update the user document with the user profile ID
-        newUser .userProfile = userProfile._id;
-        await newUser .save();
-        console.log(`User  '${userData.username}' updated with user profile ID.`);
+// Function to seed tasks
+const seedTasks = async () => {
+    for (const taskData of tasks) {
+        const newTask = new Task(taskData);
+        await newTask.save();
+        console.log(`Task '${taskData.title}' created successfully.`);
+        
+        // If the task is linked to a work order, update the work order's tasks array
+        if (taskData.workOrder) {
+            await WorkOrder.findByIdAndUpdate(
+                taskData.workOrder,
+                { $push: { tasks: newTask._id } },
+                { new: true }
+            );
+            console.log(`Task '${taskData.title}' added to Work Order '${taskData.workOrder}'.`);
+        }
     }
 };
 
 // Connect to the database
 connectDB();
 
-// Seed roles and users
-(async () => {
-    try {
-        await seedRoles();
-        await seedUsers();
-        console.log('Seeding completed successfully.');
-        process.exit(0);
-    } catch (error) {
+// Seed roles, users, pricelist, work orders, and tasks
+const seedDatabase = async () => {
+    await seedRoles();
+    await seedUsers();
+    await seedPricelist();
+    await seedWorkOrders();
+    await seedTasks();
+    console.log('Database seeding completed.');
+};
+
+// Execute the seeding process
+seedDatabase()
+    .then(() => {
+        console.log('Seeding process finished successfully.');
+        mongoose.connection.close();
+    })
+    .catch((error) => {
         console.error('Error during seeding:', error);
-        process.exit(1);
-    }
-})();
+        mongoose.connection.close();
+    });

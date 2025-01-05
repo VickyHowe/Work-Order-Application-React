@@ -1,64 +1,165 @@
 const WorkOrder = require('../models/WorkOrder');
+const Task = require('../models/Task');
+const AppError = require('../utils/AppError');
 
-// Create a new work order request from a customer
+// Create a new work order 
 exports.createWorkOrderRequest = async (req, res) => {
-    const { title, description, customerComments, priority, reminders, predefinedServices, attachments } = req.body;
+    const {
+      title,
+      description,
+      customerComments,
+      priority,
+      reminders,
+      predefinedServices,
+      attachments,
+      assignedTo,
+      deadline,
+      status,
+      internalComments,
+      resources,
+      tasks,
+    } = req.body;
+    console.log("Request body:", req.body);
     try {
-        const workOrder = await WorkOrder.create({
-            title,
-            description,
-            customerComments,
-            status: 'pending',
-            createdBy: req.user._id, // Assuming req.user is set by auth middleware
-            deadline: req.body.deadline,
-            priority,
-            reminders,
-            predefinedServices,
-            attachments
-        });
-        res.status(201).json({message: 'WorkOrder created sucessfully!', workOrder});
-    } catch (error) {
-        res.status(500).json({ message: 'Error creating work order request', error: error.message });
-    }
-};
-
-// Update work order with internal comments or status
-exports.updateWorkOrder = async (req, res) => {
-    const { id } = req.params;
-    const { status, internalComments, priority, reminders, predefinedServices, attachments } = req.body;
-
-    // Prepare the update object
-    const updateData = {
-        status,
-        priority,
+      const workOrder = await WorkOrder.create({
+        title,
+        description,
+        customerComments,
+        status: status || 'pending',
+        createdBy: req.user._id,
+        deadline,
+        priority: priority || 'medium',
         reminders,
         predefinedServices,
         attachments,
-    };
-
-    // Only add internalComments to the update if it is an array
-    if (Array.isArray(internalComments)) {
-        updateData.$push = { internalComments: { $each: internalComments } };
+        assignedTo: assignedTo || null,
+        internalComments: internalComments || [],
+        resources: resources || [],
+        tasks: tasks || [],
+      });
+      res.status(201).json({ message: 'WorkOrder created sucessfully!', workOrder });
+    } catch (error) {
+      return next(new AppError('Error creating work order request', 500));
     }
+  };
+
+// Create a new task for work order
+exports.createTaskForWorkOrder = async (req, res, next) => {
+    const { title, description, deadline, resources, user, status } = req.body;
+    const workOrderId = req.params.workOrderId;
 
     try {
-        const workOrder = await WorkOrder.findByIdAndUpdate(id, updateData, { new: true });
-        if (!workOrder) return res.status(404).json({ message: 'Work order not found' });
-        res.status(200).json({ message: 'WorkOrder edited successfully', workOrder });
+        const newTask = await Task.create({
+            title,
+            description,
+            deadline,
+            resources,
+            createdBy: req.user._id,
+            user,
+            workOrder: workOrderId,
+            status: status || 'pending'
+        });
+
+        const updatedWorkOrder = await WorkOrder.findByIdAndUpdate(
+            workOrderId,
+            { $push: { tasks: newTask._id } },
+            { new: true } 
+        );
+        res.status(201).json(newTask);
     } catch (error) {
-        res.status(500).json({ message: 'Error updating work order', error: error.message });
+        console.error(error); 
+        return next(new AppError('Error creating task for work order', 500));
     }
 };
+
+// Update work order
+exports.updateWorkOrder = async (req, res) => {
+    const { id } = req.params;
+    const {
+      title,
+      description,
+      deadline,
+      status,
+      internalComments,
+      priority,
+      reminders,
+      predefinedServices,
+      attachments,
+      assignedTo,
+      resources,
+      tasks,
+    } = req.body;
+  
+    if (!title || !description || !deadline) {
+      return next(new AppError('Please provide title, description, and deadline', 400));
+    }
+  
+    try {
+      // Fetch and check the current status
+      const workOrder = await WorkOrder.findById(id);
+      if (!workOrder) {
+        return next(new AppError('Work order not found', 404));
+      }
+  
+      // Set onTime?
+      if (status === 'completed') {
+        workOrder.completedAt = new Date();
+        workOrder.isOnTime = workOrder.completedAt <= workOrder.deadline;
+      }
+  
+      // Prepare the update data
+      const updateData = {
+        title,
+        description,
+        deadline,
+        status: status || workOrder.status,
+        priority: priority || workOrder.priority,
+        reminders,
+        predefinedServices,
+        attachments,
+        assignedTo: assignedTo || workOrder.assignedTo,
+        internalComments: internalComments || workOrder.internalComments,
+        resources: resources || workOrder.resources,
+        tasks: tasks || workOrder.tasks,
+      };
+  
+      if (Array.isArray(internalComments)) {
+        updateData.$push = { internalComments: { $each: internalComments } };
+      }
+  
+      // Update the work order
+      const updatedWorkOrder = await WorkOrder.findByIdAndUpdate(id, updateData, { new: true });
+      res.status(200).json({ message: 'WorkOrder edited successfully', workOrder: updatedWorkOrder });
+    } catch (error) {
+      return next(new AppError('Error updating work order', 500));
+    }
+  };
 
 // Delete a work order (accessible by managers and admins)
 exports.deleteWorkOrder = async (req, res) => {
     const { id } = req.params;
     try {
         const deletedWorkOrder = await WorkOrder.findByIdAndDelete(id);
-        if (!deletedWorkOrder) return res.status(404).json({ message: 'Work order not found' });
+        if (!deletedWorkOrder) 
+            return next(new AppError('Work order not found', 404));
         res.status(200).json({message: 'Work Order was sucessfully Deleted!'}); 
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting work order', error: error.message });
+        return next(new AppError('Error deleting work order', 500));
+    }
+};
+
+// Get all tasks for work Orders
+exports.getTasksForWorkOrder = async (req, res, next) => {
+    const workOrderId = req.params.workOrderId;
+
+    try {
+        const tasks = await Task.find({ workOrder: workOrderId })
+            .populate('user', 'username _id role')
+            .populate('createdBy', 'username _id role');
+
+        res.status(200).json(tasks);
+    } catch (error) {
+        return next(new AppError('Error fetching tasks for work order', 500));
     }
 };
 
@@ -66,22 +167,23 @@ exports.deleteWorkOrder = async (req, res) => {
 exports.getAllWorkOrdersForManager = async (req, res) => {
     try {
         const workOrders = await WorkOrder.find()
-            .populate('assignedTo', 'username')
+            .populate('assignedTo', 'user')
             .populate('createdBy', 'username'); 
+            console.log('Work orders:', workOrders);
         res.status(200).json(workOrders);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching work orders', error: error.message });
+        return next(new AppError('Error fetching work orders', 500));
     }
 };
 
 // Get all work orders for the logged-in user
 exports.getWorkOrdersForUser  = async (req, res) => {
     try {
-        const workOrders = await WorkOrder.find({ createdBy: req.user._id }) // Adjust based on your logic
+        const workOrders = await WorkOrder.find({ createdBy: req.user._id }) 
             .populate('assignedTo', 'username')
             .populate('createdBy', 'username');
         res.status(200).json(workOrders);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching work orders', error: error.message });
+        return next(new AppError('Error fetching work orders', 500));
     }
 };

@@ -22,6 +22,9 @@ module.exports = {
         },
         forms: {
           DEFAULT: '#CFD7CF'
+        },
+        customText: {
+          DEFAULT: '#1E7590',
         }
       },
     },

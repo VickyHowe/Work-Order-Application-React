@@ -2,48 +2,61 @@ const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../../middleware/authMiddleware");
 const workOrderController = require("../../controllers/workOrderController");
-const roleCheck = require("../../middleware/roleCheck"); // Import the roleCheck middleware
+const roleCheck = require("../../middleware/roleCheck"); 
 
-router.use(authMiddleware); // Protect all routes
+router.use(authMiddleware); 
 
-// Route for creating a new work order request (accessible by customers and employees)
+// Creating a new work order request
 router
   .route("/request")
   .post(
     roleCheck(["customer", "employee"], "create"),
     workOrderController.createWorkOrderRequest
-  ); // Create a new work order request
+  ); 
 
-// Route for updating a work order (accessible by managers and employees)
+// Update a work order
 router
   .route("/:id")
   .put(
     roleCheck(["manager", "employee"], "update"),
     workOrderController.updateWorkOrder
-  ) // Update a work order
+  )  
+  // Delete a work order
   .delete(
     roleCheck(["manager", "admin"], "delete"),
     workOrderController.deleteWorkOrder
-  ); // Delete a work order
+  );
 
-// Route for getting all work orders (accessible by managers)
+// Get all work orders
 router
   .route("/")
   .get(
-    roleCheck(["manager"], "read"),
+    roleCheck(["manager", "admin"], "view"),
     workOrderController.getAllWorkOrdersForManager
-  ); // Get all work orders for managers
+  ); 
 
 
-// Route for getting work orders for the logged-in user
+// Get work orders for the logged-in user
 router
-  .route("/user")
+  .route("/user/:id")
   .get(
-    authMiddleware,
     workOrderController.getWorkOrdersForUser 
-  ); // Get work orders for the logged-in user
+  ); 
 
+// Create a new task for a work order
+router
+  .route("/:workOrderId/tasks")
+  .post(
+    roleCheck(["admin", "manager", "employee"], "create"), 
+    workOrderController.createTaskForWorkOrder
+  ); 
 
-
+// Get all tasks for a work order
+router
+  .route("/:workOrderId/tasks")
+  .get(
+    roleCheck(["admin", "manager", "employee"], "read"),
+    workOrderController.getTasksForWorkOrder
+  ); 
 
   module.exports = router;

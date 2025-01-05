@@ -4,12 +4,12 @@ import {
   FaHome,
   FaTachometerAlt,
   FaSignInAlt,
-  FaUser ,
+  FaUser,
   FaUserPlus,
-  FaSignOutAlt, 
+  FaSignOutAlt,
+  FaListAlt,
 } from "react-icons/fa";
-import ThemeSwitcher from '../components/ThemeSwitcher ';
-
+import ThemeSwitcher from "./user/ThemeSwitcher ";
 
 const CustomNavbar = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -22,18 +22,31 @@ const CustomNavbar = ({ user, onLogout }) => {
   return (
     <Navbar className="bg-forms w-full" expand="lg">
       <div className="container-fluid max-w-screen-xl mx-auto px-4 ">
-        <Navbar.Brand as={Link} to="/" className="text-secondary-dark d-flex align-items-center">
+        <Navbar.Brand
+          as={Link}
+          to="/"
+          className="text-secondary-dark d-flex align-items-center"
+        >
           <FaHome size={34} className="me-2" />
           Home
         </Navbar.Brand>
-        <ThemeSwitcher classname="ml-5"/>
-        <h2 className="text-center text-black flex-grow-1">Get Organized Co.</h2>
+        <ThemeSwitcher classname="ml-5" />
+        <h2 className="text-center text-black flex-grow-1">
+          Get Organized Co.
+        </h2>
         <Navbar.Toggle aria-controls="navbarNav" />
         <Navbar.Collapse id="navbarNav">
+        <Nav.Link
+            as={Link}
+            className="text-center text-black flex"
+            to="/pricelist"
+          >
+            <FaListAlt className="me-2" /> View Pricelist
+          </Nav.Link>
           <Nav className="ml-auto">
             {user && (
-              <Nav.Link as={Link} className=" text-black" to="/dashboard">
-                <FaTachometerAlt className="ml-7  text-black" /> Dashboard
+              <Nav.Link as={Link} className="text-black" to="/dashboard">
+                <FaTachometerAlt className="ml-7 text-black" /> Dashboard
               </Nav.Link>
             )}
 
@@ -48,12 +61,20 @@ const CustomNavbar = ({ user, onLogout }) => {
               </>
             )}
             {user && (
-              <Nav.Link as={Link} to="/profile" className="flex items-center text-black">
-                <FaUser  className="ml-3" /> Profile
+              <Nav.Link
+                as={Link}
+                to="/profile"
+                className="flex items-center text-black"
+              >
+                <FaUser className="ml-3" /> Profile
               </Nav.Link>
             )}
             {user && (
-              <Nav.Link as={Link} onClick={handleLogout} className=" text-black">
+              <Nav.Link
+                as={Link}
+                onClick={handleLogout}
+                className=" text-black"
+              >
                 <FaSignOutAlt className="ml-4 text-black" /> Logout
               </Nav.Link>
             )}

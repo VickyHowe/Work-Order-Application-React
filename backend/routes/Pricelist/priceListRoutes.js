@@ -1,17 +1,44 @@
-const express = require('express');
-const authMiddleware = require('../../middleware/authMiddleware');
-const roleCheck = require('../../middleware/roleCheck');
-const taskController = require('../../controllers/taskController');
-const pricelistController = require('../../controllers/pricelistController');
+const express = require("express");
+const authMiddleware = require("../../middleware/authMiddleware");
+const roleCheck = require("../../middleware/roleCheck");
+const pricelistController = require("../../controllers/pricelistController");
 
 const router = express.Router();
 
-// Task routes
+//Public Pricelist Route
+router
+  .route("/")
+  .get(pricelistController.getAllPricelists) 
+
+
 router.use(authMiddleware);
 
 // Pricelist routes
-router.route('/pricelist')
-    .get(pricelistController.getAllPricelists) // Get all pricelists
-    .post(roleCheck(['manager', 'admin'], 'create'), pricelistController.createPricelist); // Create a new pricelist
+router
+  .route("/")
+  .post(
+    roleCheck(["manager", "admin"], "create"),
+    pricelistController.createPricelist
+  );
+
+// Create a new work order request from a customer
+router
+  .route("/:id/work-order")
+  .post(
+    roleCheck(["customer"], "create"),
+    pricelistController.createWorkOrderRequest
+  );
+// Update and delete a specific pricelist item
+router
+  .route("/:id")
+  .put(
+    roleCheck(["manager", "admin"], "update"),
+    pricelistController.updatePricelist
+  )
+  .delete(
+    roleCheck(["manager", "admin"], "delete"),
+    pricelistController.deletePricelist
+  );
+
 
 module.exports = router;

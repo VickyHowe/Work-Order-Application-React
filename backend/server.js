@@ -17,6 +17,8 @@ const errorHandler = require('./middleware/errorHandler');
 const taskRoute = require('./routes/Tasks/taskRoutes'); 
 const pricelistRoute = require('./routes/Pricelist/priceListRoutes');
 const workOrderRoute = require('./routes/WorkOrders/workOrderRoutes');
+const reportRoute = require('./routes/Reports/reportRoutes');
+
 
 /**
 * General Setup
@@ -29,8 +31,8 @@ const port = process.env.PORT || 5000;
 */
 app.use(cors({
   origin: 'http://localhost:5173', // Replace with your frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+  allowedHeaders: ['Content-Type', 'Authorization'], 
 }));
 
 
@@ -62,6 +64,7 @@ app.use("/api", userRoute);
 app.use("/api/tasks", taskRoute); 
 app.use("/api/pricelist", pricelistRoute);
 app.use("/api/workorders", workOrderRoute); 
+app.use("/api/reports", reportRoute);
 
 
 app.listen(port, () => console.log(`Server running on port ${port}`));

@@ -139,3 +139,110 @@ https://www.loginradius.com/blog/engineering/guest-post/nodejs-authentication-gu
 https://dev.to/bushblade/add-eslint-to-a-react-vite-project-4pib
 
 https://kdesign.co/blog/pastel-color-palette-examples/
+
+
+https://code.daypilot.org/47819/react-work-order-planning-system-php-mysql
+
+https://www.youtube.com/watch?v=PDWgxqOzvxo
+Fullstack/MERN Stack Task Manager App
+
+https://www.w3schools.com/jsreF/jsref_array_flatmap.asp
+
+https://www.youtube.com/watch?v=T1RgT0Yh1Lg
+https://d3js.org/
+
+
+
+## Still Todo
+### Missing
+#### Reports Page:
+
+The application lacks a reports page that uses libraries like Plotly.js or d3.js to display trends, statistics, and analytics related to work orders, tasks, and costs.
+
+#### Customer Page:
+
+The customer page, which should allow customers to view their work orders, request new ones, and communicate with the business, is not implemented.
+
+##### Resource Page:
+
+The resource page, which should display personnel skills, availability, and equipment, is not fully developed.
+
+#### Preventative Maintenance Tracker:
+
+The preventative maintenance tracker, which involves templates to auto-schedule tasks, is not implemented.
+
+
+#### API Documentation:
+
+The API documentation using Swagger is not fully set up or accessible.
+
+
+#### Testing:
+
+Comprehensive testing using Mocha and/or Chai is not completed.
+Deployment:
+
+The application is not yet deployed to Render and MongoDB.
+
+#### Error Handling:
+
+While some error handling is in place, it needs to be more robust across the entire application.
+
+#### Notifications:
+
+The notification system for users (e.g., task updates, work order status changes) is not implemented.
+
+#### Role-Based Permissions:
+
+While roles and permissions are partially implemented, they need to be fully integrated across all features.
+
+#### Styling and UI/UX:
+
+The application needs more consistent styling and a polished user interface.
+
+### Todo
+
+#### Reports Page:
+
+Integrate Plotly.js or d3.js to create visualizations for work order completion rates, task timelines, and cost analysis.
+
+#### Customer Page:
+
+Develop a customer-facing page where customers can view their work orders, request new ones, and communicate with the business.
+
+##### Resource Page:
+
+Create a page to display personnel skills, availability, and equipment. This should include CRUD functionality for managing resources.
+
+#### Preventative Maintenance Tracker:
+
+Implement a feature to create templates for recurring tasks and auto-schedule them based on predefined intervals.
+
+#### API Documentation:
+
+Set up Swagger to document the API endpoints and make them accessible via /api-docs.
+
+#### Testing:
+
+Write unit and integration tests for both the backend and frontend using Mocha, Chai, and React Testing Library.
+
+#### Deployment:
+
+Deploy the application to Render and MongoDB Atlas. Ensure the environment variables are properly configured.
+
+#### Error Handling:
+
+Add comprehensive error handling for all API endpoints and frontend components. Ensure meaningful error messages are displayed to users.
+
+#### Notifications:
+
+Implement a notification system using WebSocket or a third-party service like Firebase to notify users of updates.
+
+#### Role-Based Permissions:
+
+Fully integrate role-based permissions across all features. Ensure that users can only access and modify data based on their roles.
+
+#### Styling and UI/UX:
+
+Apply consistent styling using Tailwind CSS and Bootstrap. Ensure the application is responsive and user-friendly.
+
