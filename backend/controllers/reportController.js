@@ -1,8 +1,13 @@
 const WorkOrder = require("../models/WorkOrder");
 const Task = require("../models/Task");
+const AppError = require("../utils/AppError");
 
+/**
+ * Retrieves report data for work orders and tasks.
+ */
 const getReportData = async (req, res) => {
   try {
+    // Fetch all work orders and tasks
     const workOrders = await WorkOrder.find();
     const tasks = await Task.find();
 
@@ -124,7 +129,7 @@ const getReportData = async (req, res) => {
 
     res.status(200).json(reportData);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching report data", error });
+    return next(new AppError("Error fetching report data", 500));
   }
 };
 

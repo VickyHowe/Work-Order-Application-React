@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema(
     securityQuestionAnswer: { type: String, required: true },
     role: { type: mongoose.Schema.Types.ObjectId, ref: "Role" },
     userProfile: { type: mongoose.Schema.Types.ObjectId, ref: "UserProfile" },
+    isGolden : { type: Boolean, default: false },
   },
   {
     toJSON: {

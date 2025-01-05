@@ -1,43 +1,54 @@
-const Role = require('../models/Role');
+const Role = require("../models/Role");
+const AppError = require("../utils/AppError");
 
-exports.createRole = async (req, res) => {
-    const { name, canAssign, permissions } = req.body; 
+/**
+ * Creates a new role.
+ */
+exports.createRole = async (req, res, next) => {
+  // Extract the role name and permissions from the request body
+  const { name, canAssign, permissions } = req.body;
 
-    // Check if the requester has permission to create roles
-    const requester = req.user; 
+  // Check if the requester has permission to create roles
+  const requester = req.user;
 
+  // Check if the requester has the 'create' permission for roles
+  const hasCreatePermission = requester.role.permissions.some(
+    (permission) =>
+      (permission.resource === "roles" && permission.action === "create") ||
+      (permission.resource === "*" && permission.action === "*")
+  );
 
-    // Check if the requester has the 'create' permission for roles
-    const hasCreatePermission = requester.role.permissions.some(permission => 
-        (permission.resource === 'roles' && permission.action === 'create') || 
-        (permission.resource === '*' && permission.action === '*') 
+  if (!hasCreatePermission) {
+    return next(
+      new AppError("You do not have permission to perform this action", 403)
     );
+  }
 
-    if (!hasCreatePermission) {
-        return res.status(403).json({ message: "You do not have permission to perform this action" });
-    }
+  if (!name || !Array.isArray(permissions)) {
+    return next(
+      new AppError("Role name and permissions must be provided", 400)
+    );
+  }
 
-    if (!name || !Array.isArray(permissions)) {
-        return res.status(400).json({ message: "Role name and permissions must be provided" });
-    }
-
-    try {
-        const role = await Role.create({ name, canAssign, permissions });
-        return res.status(201).json({ message: "Role created successfully", role });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "An internal server error occurred" });
-    }
+  try {
+    const role = await Role.create({ name, canAssign, permissions });
+    return res.status(201).json({ message: "Role created successfully", role });
+  } catch (error) {
+    console.error(error); // Log the error for debugging purposes
+    return next(new AppError("An internal server error occurred", 500));
+  }
 };
 
-
-
-exports.getAllRoles = async (req, res) => {
-    try {
-        const roles = await Role.find();
-        return res.status(200).json(roles);
-    } catch (error) {
-        console.error('Error fetching roles:', error);
-        return res.status(500).json({ message: 'An error occurred while fetching roles' });
-    }
+/**
+ * Retrieves all roles.
+ */
+exports.getAllRoles = async (req, res, next) => {
+  try {
+    // Fetch all roles from the database
+    const roles = await Role.find();
+    return res.status(200).json(roles);
+  } catch (error) {
+    console.error("Error fetching roles:", error); // Log the error for debugging purposes
+    return next(new AppError("An error occurred while fetching roles", 500));
+  }
 };
