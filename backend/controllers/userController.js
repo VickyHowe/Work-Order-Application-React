@@ -88,6 +88,11 @@ exports.updateUserRole = async (req, res, next) => {
     const user = await User.findById(id);
     if (!user) return next(new AppError("User not found", 404));
 
+    // Check if the user is a golden user
+    if (user.isGolden) {
+      return next(new AppError("Cannot modify golden users", 403));
+    }
+
     user.role = roleId;
     await user.save();
     return res
@@ -104,21 +109,27 @@ exports.updateUserRole = async (req, res, next) => {
  * Deletes a user from the database.
  */
 
-exports.deleteUser = async (req, res, next) => {
+exports.deleteUser  = async (req, res, next) => {
   const { id } = req.params;
 
-  if (!id) return next(new AppError("User ID must be provided", 400));
+  if (!id) return next(new AppError("User  ID must be provided", 400));
 
   try {
+    const user = await User.findById(id);
+    if (!user) return next(new AppError("User  not found", 404));
+
+    // Check if the user is a golden user
+    if (user.isGolden) {
+      return next(new AppError("Cannot delete golden users", 403));
+    }
+
     const result = await User.deleteOne({ _id: id });
-    if (result.deletedCount === 0)
-      return next(new AppError("User not found", 404));
+    if (result.deletedCount === 0) return next(new AppError("User  not found", 404));
     return res.status(200).json({ message: "User  successfully deleted" });
   } catch (error) {
     return next(new AppError("An error occurred while deleting the user", 500));
   }
 };
-
 /**
  * Updates the user's profile.
  */
@@ -135,6 +146,14 @@ exports.updateProfile = async (req, res, next) => {
   } = req.body;
 
   try {
+    const user = await User.findById(req.user.id);
+    if (!user) return next(new AppError("User  not found", 404));
+
+    // Check if the user is a golden user
+    if (user.isGolden) {
+      return next(new AppError("Cannot modify golden users' profiles", 403));
+    }
+
     const profile = await UserProfile.findOneAndUpdate(
       { user: req.user.id },
       {
@@ -161,9 +180,7 @@ exports.updateProfile = async (req, res, next) => {
     if (error.name === "ValidationError") {
       return next(new AppError(error.message, 400));
     }
-    return next(
-      new AppError("An error occurred while updating the profile", 500)
-    );
+    return next(new AppError("An error occurred while updating the profile", 500));
   }
 };
 
