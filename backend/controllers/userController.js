@@ -4,72 +4,64 @@ const bcrypt = require("bcryptjs");
 const { generateToken } = require("../utils/tokenGenerator");
 const AppError = require("../utils/AppError");
 
-const handleError = (res, error, message, statusCode = 500) => {
-  console.error(message, error);
-  return res.status(statusCode).json({ message });
-};
-
-// Request Password Reset using Security Questions
-exports.requestPasswordReset = async (req, res) => {
+/**
+ * Requests a password reset using security questions.
+ */
+exports.requestPasswordReset = async (req, res, next) => {
   const { username } = req.body;
   try {
     const user = await User.findOne({ username });
-    if (!user) return handleError(res, null, "User  not found", 404);
+    if (!user) return next(new AppError("User not found", 404));
     return res.status(200).json({ securityQuestion: user.securityQuestion });
   } catch (error) {
-    return handleError(
-      res,
-      error,
-      "An error occurred while requesting password reset"
+    return next(
+      new AppError("An error occurred while requesting password reset", 500)
     );
   }
 };
 
-// Verify Security Question Answer
-exports.verifySecurityQuestion = async (req, res) => {
+/**
+ * Requests a password reset using security questions.
+ */
+exports.verifySecurityQuestion = async (req, res, next) => {
   const { username, securityQuestionAnswer } = req.body;
   try {
     const user = await User.findOne({ username });
-    if (!user) return handleError(res, null, "User  not found", 404);
+    if (!user) return next(new AppError("User not found", 404));
 
     const isMatch = await bcrypt.compare(
       securityQuestionAnswer,
       user.securityQuestionAnswer
     );
     if (!isMatch)
-      return handleError(
-        res,
-        null,
-        "Incorrect answer to security question",
-        400
-      );
+      return next(new AppError("Incorrect answer to security question", 400));
 
     const token = generateToken(user._id);
-    return res
-      .status(200)
-      .json({
-        message:
-          "Security question answered correctly. You can now reset your password.",
-        token,
-      });
+    return res.status(200).json({
+      message:
+        "Security question answered correctly. You can now reset your password.",
+      token,
+    });
   } catch (error) {
-    return handleError(
-      res,
-      error,
-      "An error occurred while verifying the security question answer"
+    return next(
+      new AppError(
+        "An error occurred while verifying the security question answer",
+        500
+      )
     );
   }
 };
 
-// Reset Password using Token
-exports.resetPasswordWithToken = async (req, res) => {
+/**
+ * Resets the password using a token.
+ */
+exports.resetPasswordWithToken = async (req, res, next) => {
   const { newPassword } = req.body;
-  if (!newPassword)
-    return handleError(res, null, "New password is required", 400);
+  if (!newPassword) return next(new AppError("New password is required", 400));
 
   try {
     const user = req.user;
-    if (!user) return handleError(res, null, "Invalid token", 401);
+    if (!user) return next(new AppError("Invalid token", 401));
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
@@ -77,24 +69,24 @@ exports.resetPasswordWithToken = async (req, res) => {
       .status(200)
       .json({ message: "Password has been reset successfully" });
   } catch (error) {
-    return handleError(
-      res,
-      error,
-      "An error occurred while resetting the password"
+    return next(
+      new AppError("An error occurred while resetting the password", 500)
     );
   }
 };
 
-// Update User Role
-exports.updateUserRole = async (req, res) => {
+/**
+ * Updates the role of a user.
+ */
+exports.updateUserRole = async (req, res, next) => {
   const { roleId } = req.body;
   const { id } = req.params;
 
-  if (!roleId) return handleError(res, null, "Role ID must be provided", 400);
+  if (!roleId) return next(new AppError("Role ID must be provided", 400));
 
   try {
     const user = await User.findById(id);
-    if (!user) return handleError(res, null, "User  not found", 404);
+    if (!user) return next(new AppError("User not found", 404));
 
     user.role = roleId;
     await user.save();
@@ -102,31 +94,34 @@ exports.updateUserRole = async (req, res) => {
       .status(200)
       .json({ message: "User  role updated successfully", user });
   } catch (error) {
-    return handleError(
-      res,
-      error,
-      "An error occurred while updating the user role"
+    return next(
+      new AppError("An error occurred while updating the user role", 500)
     );
   }
 };
 
-// Delete User
-exports.deleteUser = async (req, res) => {
+/**
+ * Deletes a user from the database.
+ */
+
+exports.deleteUser = async (req, res, next) => {
   const { id } = req.params;
 
-  if (!id) return handleError(res, null, "User  ID must be provided", 400);
+  if (!id) return next(new AppError("User ID must be provided", 400));
 
   try {
     const result = await User.deleteOne({ _id: id });
     if (result.deletedCount === 0)
-      return handleError(res, null, "User  not found", 404);
+      return next(new AppError("User not found", 404));
     return res.status(200).json({ message: "User  successfully deleted" });
   } catch (error) {
-    return handleError(res, error, "An error occurred while deleting the user");
+    return next(new AppError("An error occurred while deleting the user", 500));
   }
 };
 
-// Update User Profile
+/**
+ * Updates the user's profile.
+ */
 exports.updateProfile = async (req, res, next) => {
   const {
     firstName,
@@ -172,8 +167,10 @@ exports.updateProfile = async (req, res, next) => {
   }
 };
 
-// Update Specific user
-exports.updateUser = async (req, res) => {
+/**
+ * Updates a specific user by ID.
+ */
+exports.updateUser = async (req, res, next) => {
   const { id } = req.params;
   const { username, email, profileDetails } = req.body;
 
@@ -185,7 +182,7 @@ exports.updateUser = async (req, res) => {
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ message: "User  not found" });
+      return next(new AppError("User  not found", 404));
     }
 
     // Update the user's profile details
@@ -216,20 +213,22 @@ exports.updateUser = async (req, res) => {
 
     return res.status(200).json(response);
   } catch (error) {
-    console.error("Error updating user:", error);
-    return res.status(500).json({ message: "Server error" });
+    console.error("Error updating user:", error); // Log the error for debugging purposes
+    return next(new AppError("Server error", 500));
   }
 };
 
-// Get User Profile
-exports.getProfile = async (req, res) => {
+/**
+ * Retrieves the user's profile.
+ */
+exports.getProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id)
       .select("-password -securityQuestion -securityQuestionAnswer")
       .populate("role", "name");
 
     if (!user) {
-      return res.status(404).json({ message: "User  not found" });
+      return next(new AppError("User  not found", 404));
     }
 
     const userProfile = await UserProfile.findOne({ user: user._id });
@@ -254,38 +253,42 @@ exports.getProfile = async (req, res) => {
 
     return res.status(200).json(formattedUser);
   } catch (error) {
-    console.error("Error fetching user profile:", error);
-    return res
-      .status(500)
-      .json({ message: "An error occurred while fetching user profile" });
+    console.error("Error fetching user profile:", error); // Log the error for debugging purposes
+    return next(
+      new AppError("An error occurred while fetching user profile", 500)
+    );
   }
 };
 
-exports.getUserById = async (req, res) => {
+/**
+ * Retrieves a user by ID.
+ */
+exports.getUserById = async (req, res, next) => {
   const { id } = req.params;
   try {
-    const user = await User.findById(id).populate('userProfile');
-    console.log("Fetched user data:", user);
-    
+    const user = await User.findById(id).populate("userProfile");
+
     if (!user) {
-      return res.status(404).json({ message: "User  not found" });
+      return next(new AppError("User not found", 404));
     }
 
-      return res.status(200).json({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        profilePicture: user.userProfile ? user.userProfile.profilePicture : null, 
-      });
-
+    return res.status(200).json({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      profilePicture: user.userProfile ? user.userProfile.profilePicture : null,
+    });
   } catch (error) {
-    console.error("Error fetching user data:", error);
-    return res.status(500).json({ message: "Server error" });
+    console.error("Error fetching user data:", error); // Log the error for debugging purposes
+    return next(new AppError("Server error", 500));
   }
 };
-// Get All Users
-exports.getAllUsers = async (req, res) => {
+
+/**
+ * Retrieves all users from the database.
+ */
+exports.getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find()
       .select("-password -securityQuestion -securityQuestionAnswer")
@@ -293,13 +296,11 @@ exports.getAllUsers = async (req, res) => {
 
     if (!users || users.length === 0) {
       console.warn("No users found in the database.");
-      return res.status(404).json({ message: "No users found." });
+      return next(new AppError("No users found.", 404));
     }
 
     const formattedUsers = await Promise.all(
       users.map(async (user) => {
-
-
         const userProfile = await UserProfile.findOne({ user: user._id });
         if (!userProfile) {
           return {
@@ -343,7 +344,7 @@ exports.getAllUsers = async (req, res) => {
 
     return res.status(200).json(formattedUsers);
   } catch (error) {
-    console.error("Error fetching users:", error);
-    return handleError(res, error, "An error occurred while fetching users");
+    console.error("Error fetching users:", error); // Log the error for debugging purposes
+    return next(new AppError("An error occurred while fetching users", 500));
   }
 };
