@@ -12,6 +12,7 @@ const AdminComponent = (userRole) => {
   return (
     <div className="mx-auto mt-10 p-6 bg-forms text-black border-gray rounded-lg shadow-md w-full sm:max-w-md md:max-w-lg lg:max-w-4xl">
       <h2 className="text-2xl mb-4 text-center">Admin Dashboard</h2>
+      <p className="text-center mb-4">The Admin User has full edit, create, delete control of workOrders, tasks, pricelist, users ect.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Card for Task List */}
         <div className="bg-white rounded-lg shadow-md p-6 w-full h-64 relative overflow-hidden">
