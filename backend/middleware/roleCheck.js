@@ -1,11 +1,8 @@
 const roleCheck = (allowedRoles, action) => {
     return (req, res, next) => {
         const userRole = req.user.role; 
-        console.log("Authenticated user:", req.user);
-        console.log("Checking permissions for action:", action);
-
         const userId = req.params.id; 
-        console.log("Authenticated user:", req.user);
+
 
         // Check if userRole is defined and has canAssign and permissions properties
         if (
@@ -13,7 +10,6 @@ const roleCheck = (allowedRoles, action) => {
             !Array.isArray(userRole.canAssign) ||
             !Array.isArray(userRole.permissions)
         ) {
-            console.log("User  Role or Permissions not found:", userRole);
             return res
                 .status(403)
                 .json({ message: "You do not have permission to perform this action" });
@@ -52,8 +48,6 @@ const roleCheck = (allowedRoles, action) => {
                 (permission.resource === 'report' && permission.action === action) || 
                 (permission.resource === "*" && permission.action === "*") 
         );
-
-        console.log("Has Action Permission:", hasActionPermission); 
 
         if (!hasActionPermission) {
             return res

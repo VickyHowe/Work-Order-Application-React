@@ -83,8 +83,7 @@ const CustomerComponent = ({ userRole }) => {
     setSelectedService(null);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (formData) => {
     setFieldErrors({});
 
     // Basic validation
@@ -273,10 +272,11 @@ const CustomerComponent = ({ userRole }) => {
               <WorkOrderForm
                 formData={formData}
                 setFormData={setFormData}
-                onSubmit={handleSubmit}
+                onSubmit={(formData) => handleSubmit(formData)}
                 fieldErrors={fieldErrors}
                 userRole={userRole}
                 onClose={handleCloseModal}
+                selectedService={selectedService} // Pass selectedService prop
               />
             </div>
           </div>

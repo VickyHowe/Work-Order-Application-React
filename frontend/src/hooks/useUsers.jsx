@@ -1,22 +1,11 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import useApi from "./useApi";
 
 const useUsers = (token) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const apiCall = async (url, method = "get", data = {}) => {
-    const response = await axios({
-      method,
-      url: `${import.meta.env.VITE_BACKEND_URL}${url}`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      data,
-    });
-    return response.data;
-  };
+  const { apiCall } = useApi();
 
   const fetchUsers = async () => {
     try {

@@ -31,14 +31,14 @@ router
 router
   .route("/")
   .get(
-    roleCheck(["manager", "admin"], "read"),
+    roleCheck(["manager", "admin"], "view"),
     workOrderController.getAllWorkOrdersForManager
   ); 
 
 
 // Get work orders for the logged-in user
 router
-  .route("/user")
+  .route("/user/:id")
   .get(
     workOrderController.getWorkOrdersForUser 
   ); 

@@ -1,42 +1,42 @@
-import { useEffect, useState, useCallback } from 'react';
-import axios from 'axios';
+import { useState, useEffect, useCallback } from 'react';
+import useApi from './useApi';
 
-const useFetchWorkOrders = (token, userRole) => {
-    const [workOrders, setWorkOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const useFetchWorkOrders = (token, userRole, userId) => {
+  const [workOrders, setWorkOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { apiCall, loading: apiLoading, error: apiError } = useApi();
 
-    const fetchWorkOrders = useCallback(async () => {
-        setLoading(true);
-        try {
-            let url;
-            if (userRole === 'admin' || userRole === 'manager') {
+  const fetchWorkOrders = useCallback(async () => {
+    setLoading(true);
+    console.log('My Userrole:', userRole);
+    try {
+      let url;
+      if (userRole === 'admin' || userRole === 'manager') {
+        url = '/api/workorders';
+      } else {
+        url = `/api/workorders/user/${userId}`;
+      }
 
-                url = `${import.meta.env.VITE_BACKEND_URL}/api/workorders`;
-            } else {
+      console.log('Fetching work orders from URL:', url);
 
-                url = `${import.meta.env.VITE_BACKEND_URL}/api/workorders/user`;
-            }
+      const response = await apiCall(url);
+      setWorkOrders(response);
+    } catch (error) {
+      setError("Error fetching work orders");
+      console.error("Error fetching work orders:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [apiCall, userRole, userId]);
 
-            const response = await axios.get(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setWorkOrders(response.data);
-        } catch (error) {
-            setError("Error fetching work orders");
-            console.error("Error fetching work orders:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [token, userRole]);
+  useEffect(() => {
+    if (userId) {
+      fetchWorkOrders();
+    }
+  }, [fetchWorkOrders, userId]);
 
-    useEffect(() => {
-        fetchWorkOrders();
-    }, [fetchWorkOrders]);
-
-    return { workOrders, setWorkOrders, loading, error, fetchWorkOrders };
+  return { workOrders, setWorkOrders, loading: loading || apiLoading, error: error || apiError, fetchWorkOrders };
 };
 
 export default useFetchWorkOrders;

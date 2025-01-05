@@ -294,6 +294,7 @@ const handleCreateOrder = async () => {
       startAccessor="start"
       endAccessor="end"
       style={{ height: 500 }}
+      
       onSelectEvent={handleSelectEvent}
       eventPropGetter={eventPropGetter}
       selectable

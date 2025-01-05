@@ -4,6 +4,7 @@ import userManagementImage from "../../assets/img04_manageUsers.jpg";
 import pricelistManagementImage from "../../assets/img05_pricelist.jpg";
 import calendarImage from "../../assets/img03_workorder.jpg";
 import reportsImage from "../../assets/img06_reports.jpg";
+import WorkOrderCard from '../workOrders/WorkOrderCard';
 
 const ManagerComponent = ({ userRole }) => {
   console.log("User  role in ManagerComponent:", userRole); // Log the user role
@@ -30,20 +31,8 @@ const ManagerComponent = ({ userRole }) => {
           </div>
         </div>
 
-        {/* Card for Work Orders */}
-        <div className="bg-white rounded-lg shadow-md p-6 w-full h-64 relative overflow-hidden">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${calendarImage})` }}
-          />
-          <div className="relative z-10 p-4">
-            <Link to="/calendar">
-              <button className="bg-secondary-light text-black p-2 mt-8 w-full rounded-md hover:bg-blue-600">
-                Manage Work Orders
-              </button>
-            </Link>
-          </div>
-        </div>
+        {/* Work Order Card */}
+        <WorkOrderCard userRole={userRole} />
 
         {/* Card for User Management */}
         <div className="bg-white rounded-lg shadow-md p-6 w-full h-64 relative overflow-hidden">

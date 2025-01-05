@@ -44,17 +44,13 @@ const TaskForm = ({ formData, setFormData, users, onSubmit, fieldErrors }) => {
       />
 <label className="block mb-1">Assigned To</label>
 <select
-  value={formData.assignedUserId}
+  value={assignedToValue}
   onChange={(e) => {
     const selectedUserId = e.target.value;
-    const selectedUser  = users.find((user) => user._id === selectedUserId);
-    setFormData({
-      ...formData,
-      assignedUserId: selectedUserId,
-      username: selectedUser  ? selectedUser .username : "",
-    });
+    const selectedUser = users.find((user) => user._id === selectedUserId);
+    setAssignedToValue(selectedUserId);
   }}
-  className={`border p-2 mb-2 w-full`} // Removed fieldErrors.assignedUserId
+  className={`border p-2 mb-2 w-full`}
 >
   <option value="">Select User</option>
   {users.map((user) => (
