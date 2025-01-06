@@ -23,10 +23,10 @@ const roleCheck = (allowedRoles, action) => {
     const hasRolePermission =
       allowedRoles.includes(userRole.name) || userRole.canAssign.includes("*");
 
-    // Allow admin to bypass role permission checks
-    if (userRole.name === "admin") {
-      return next();
-    }
+    // // Allow admin to bypass role permission checks
+    // if (userRole.name === "admin") {
+    //   return next();
+    // }
 
 
     // Check if the user being modified is a golden user
