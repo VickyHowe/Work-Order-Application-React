@@ -26,9 +26,26 @@ Client
 https://work-order-application-react-frontend.onrender.com 
 
 
+### Demo Users
+- Admin
+    - username: "admin",
+    - password: "admin123",
+
+- Manager
+    - username: "manager",
+    - password: "manager123",
+
+- Employee
+    - username: "employee",
+    - password: "employee123",
+- Customer
+    - username: "customer",
+    - password: "customer123",
+
+
 
 ## Setup
-    - Clone the [repository](https://github.com/VickyHowe/Work-Order-Application-React.git)
+    - Clone the repository https://github.com/VickyHowe/Work-Order-Application-React.git
 
 ### Frontend Setup
 1. cd into the `frontend`
